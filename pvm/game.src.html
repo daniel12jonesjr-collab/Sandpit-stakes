@@ -230,6 +230,10 @@
   .ware .r.no { color: #ff5050; }
   .ware .bn { grid-column: 2; font-size: 13px; color: #9fe870; text-shadow: 1px 1px 0 #000; line-height: 1.25; }
   .ware .bn i { font-style: normal; color: #e0d2ae; }
+  .ware .r i { font-style: normal; color: #fff; }
+  .ware.guide { grid-template-columns: 36px 1fr; margin-bottom: 4px; }
+  .ware.guide .n, .ware.guide .r, .ware.guide .bn { grid-column: 2; }
+  .ware.guide .r span { font-weight: 700; text-shadow: 1px 1px 0 #000; }
   .ware .buy { grid-row: 1 / 4; grid-column: 3; height: 36px; min-width: 84px; font-size: 14px; line-height: 1.1; }
   .ware .buy b { display: block; color: var(--yellow); }
   .owned { color: var(--green); }
@@ -292,6 +296,13 @@
         <div class="prayers" id="prayers"></div>
       </div>
       <div class="eat">
+        <div class="lbl">Auto-Schutzgebet <span style="color:#c9b995;font-size:12px">(ab Gebet 37)</span></div>
+        <div class="row3" id="autoPrayRow" style="grid-template-columns:repeat(2,1fr)">
+          <button class="btn" data-ap="1">An</button><button class="btn" data-ap="0">Aus</button>
+        </div>
+        <div class="note" style="margin-top:4px">Schaltet automatisch das passende Schutzgebet ein, sobald der Gegner seinen nächsten Angriffsstil ankündigt.</div>
+      </div>
+      <div class="eat">
         <div class="lbl">Knochen</div>
         <div class="row3" id="bonesRow" style="grid-template-columns:repeat(3,1fr)">
           <button class="btn" data-bones="bury">Vergraben</button><button class="btn" data-bones="inv">Inventar</button><button class="btn" data-bones="bank">Bank</button>
@@ -351,6 +362,11 @@
       <div class="ptitle">Loot-Tracker</div>
       <div class="sub" id="lootSum"></div>
       <div id="lootList"></div>
+      <div class="ptitle" style="margin-top:14px">Drop-Guide: Wo droppt was?</div>
+      <div class="row3 cats" id="guideCats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:6px">
+        <button class="btn" data-g="mage">Magie</button><button class="btn" data-g="range">Fern</button><button class="btn" data-g="melee">Nah</button><button class="btn" data-g="acc">Zubehör</button>
+      </div>
+      <div id="dropGuide"></div>
     </div>
 
     <div class="panel" data-panel="opts" hidden>
@@ -398,7 +414,7 @@
 <script>
 (() => {
   "use strict";
-  const VERSION = 9;
+  const VERSION = 10;
   const G = window.Grind;
   const $ = id => document.getElementById(id);
   const rnd = n => Math.floor(Math.random() * n);
@@ -417,7 +433,7 @@
       xp: { att: 0, str: 0, def: 0, range: 0, mage: 0, pray: 0, hp: G.XP_TABLE[10] },
       hp: 10, pp: 1, prayers: [], coins: 100, inv, bank: {},
       eq: { weapon: "melee:0", helm: null, body: null, legs: null, shield: null },
-      style: "acc", spot: 0, kills: {}, eatAt: 50, bonesTo: "bury", fast: false, totalXp: 0, deaths: 0,
+      style: "acc", spot: 0, kills: {}, eatAt: 50, bonesTo: "bury", autoPray: true, fast: false, totalXp: 0, deaths: 0,
     };
   }
   function normalize(o) {
@@ -429,7 +445,11 @@
     s.inv = (Array.isArray(s.inv) ? s.inv : []).concat(new Array(INV_SIZE).fill(null)).slice(0, INV_SIZE);
     s.bank = s.bank && typeof s.bank === "object" ? s.bank : {};
     s.kills = s.kills || {};
-    s.spot = Math.max(0, Math.min(G.MONSTERS.length - 1, s.spot | 0));
+    // Ort wird ueber die Monster-ID gespeichert (die Liste kann wachsen). Alte Spielstaende: Index der alten Liste.
+    const OLD = ["chicken","rat","goblin","wolf","hillgiant","troll","firegiant","hellhound","demon","gargoyle","abyssal","dragon","dharok","darkbeast","graardor","kbd","nex"];
+    const sid = s.spotId || OLD[s.spot | 0] || "chicken";
+    s.spot = Math.max(0, G.MONSTERS.findIndex(m => m.id === sid));
+    s.spotId = G.MONSTERS[s.spot].id;
     return s;
   }
   let S = normalize(null);
@@ -580,6 +600,7 @@
   function spawnMonster(animate = true) {
     F.data = mon(); F.style = G.pickStyle(F.data);
     F.hp = F.data.hp; F.dead = false; F.deadT = 0; F.atkTimer = 2; F.flash = 0; F.anim = null;
+    setTimeout(autoProtect, 0);
     F.x = 156 + Math.min(26, (F.data.size - 1) * 34);
     F.grow = animate ? 1 : 0;
     if (F.data.id !== "chicken") img("m_" + F.data.id);
@@ -588,7 +609,7 @@
   }
   function goTo(i) {
     const was = S.spot;
-    S.spot = i; persist();
+    S.spot = i; S.spotId = G.MONSTERS[i].id; persist();
     buildWorld(mon().ground, i * 977 + 13);
     rebuildPlayer();
     spawnMonster(false);
@@ -809,6 +830,13 @@
       }
     }
 
+    // Kein Essen mehr und wenig Leben: automatisch zurueckziehen statt sterben
+    if (S.hp <= maxHp() * .25 && bestFoodIndex() < 0) {
+      fighting = false; renderFightBtn();
+      chat("Kein Essen mehr! Du ziehst dich zurück. Kauf neues Essen im Shop.", "red");
+      overhead("me", "Rückzug!", 1200);
+      return;
+    }
     // Spieler greift an
     if (--P.atkTimer <= 0) {
       P.atkTimer = 4;
@@ -847,6 +875,7 @@
       else proj2d(F.x - 14, P.x + 8, GROUND - 34, F.data.id === "dragon" ? "dragonfire" : mstyle === "mage" ? "mage" : "range", 6, hitMe, -1);
       F.style = G.pickStyle(F.data);
       if (F.style !== mstyle && F.data.styles.length > 1) chat(`${esc(F.data.name)} wechselt zu ${STYLE_DE[F.style]}!`, "red");
+      autoProtect();
       renderTarget();
     }
   }
@@ -1162,6 +1191,7 @@
     }
     document.querySelectorAll("#eatRow .btn").forEach(b => b.setAttribute("aria-pressed", String(+b.dataset.eat === S.eatAt)));
     document.querySelectorAll("#bonesRow .btn").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.bones === S.bonesTo)));
+    document.querySelectorAll("#autoPrayRow .btn").forEach(b => b.setAttribute("aria-pressed", String((b.dataset.ap === "1") === !!S.autoPray)));
     const pbox = $("prayers"); pbox.innerHTML = "";
     const plv = G.levelFor(S.xp.pray);
     $("ppText").textContent = `${Math.ceil(S.pp)} / ${maxPp()} Punkte`;
@@ -1206,6 +1236,15 @@
     return parts.join(" · ");
   }
 
+  // Auto-Schutzgebet: schaltet auf den angekuendigten Angriffsstil des Gegners
+  function autoProtect() {
+    if (!S.autoPray || !fighting || F.dead || !F.data || S.pp <= 0) return;
+    const id = { melee: "pmelee", range: "prange", mage: "pmage" }[F.style];
+    const p = G.PRAYERS.find(x => x.id === id);
+    if (!p || G.levelFor(S.xp.pray) < p.lvl || S.prayers.includes(id)) return;
+    S.prayers = S.prayers.filter(x => !G.prayerConflicts(x, id)).concat(id);
+    renderCombat(); renderOrbs();
+  }
   function togglePrayer(id) {
     if (S.prayers.includes(id)) S.prayers = S.prayers.filter(x => x !== id);
     else {
@@ -1398,7 +1437,40 @@
       <span>Dein Max-Hit</span><b>${atk.max}</b>`;
   }
 
+  let guideCat = "mage";
+  function itemStyle(id) {
+    const u = G.ITEMS[id];
+    if (G.isGear(id)) { const { slot } = G.parseItem(id); return ["melee", "range", "mage"].includes(slot) ? slot : "melee"; }
+    if (!u || u.mat || u.clue) return null;
+    if (u.set === "mage" || u.slot === "mage") return "mage";
+    if (u.set === "range" || u.slot === "range") return "range";
+    if (u.slot === "melee") return "melee";
+    if (["helm", "body", "legs", "shield"].includes(u.slot)) return "melee";
+    return "acc";
+  }
+  function renderGuide() {
+    const box = $("dropGuide"); if (!box) return;
+    document.querySelectorAll("#guideCats .btn").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.g === guideCat)));
+    const map = {};
+    for (const m of G.MONSTERS) for (const [id, , rate] of m.drops) {
+      if (itemStyle(id) !== guideCat) continue;
+      if (G.isGear(id) && G.parseItem(id).tier < 6) continue;
+      (map[id] = map[id] || []).push([m, rate]);
+    }
+    const ids = Object.keys(map).sort((a, b) => G.baseValue(b) - G.baseValue(a) || G.itemName(a).localeCompare(G.itemName(b)));
+    box.innerHTML = "";
+    const c = cmb();
+    for (const id of ids) {
+      const src = map[id].sort((a, b) => a[1] - b[1]).slice(0, 3)
+        .map(([m, rate]) => `<span style="color:${G.levelColour(c, m.lvl)}">${esc(m.name)}</span> <i>1/${rate}</i>`).join(" · ");
+      const el = document.createElement("div"); el.className = "ware guide";
+      el.innerHTML = `<img alt="" src="${icon(id)}"><span class="n">${esc(G.itemName(id))}</span><span class="r">Droppt bei: ${src}</span>${bonusText(id) ? `<span class="bn">${bonusText(id)}</span>` : ""}`;
+      box.appendChild(el);
+    }
+  }
+  document.addEventListener("click", e => { const b = e.target.closest("#guideCats .btn"); if (b) { guideCat = b.dataset.g; renderGuide(); } });
   function renderLoot() {
+    renderGuide();
     const list = $("lootList"); if (!list) return;
     const ids = Object.keys(S.loot).sort((a, b) => S.loot[b].gp - S.loot[a].gp);
     const total = ids.reduce((a, k) => a + S.loot[k].gp, 0), kills = ids.reduce((a, k) => a + S.loot[k].kills, 0);
@@ -1424,9 +1496,8 @@
     G.MONSTERS.forEach((m, i) => {
       const b = document.createElement("button");
       b.className = "place"; b.setAttribute("aria-pressed", String(i === S.spot));
-      const gear = m.drops.filter(d => G.isGear(d[0])).map(d => G.itemName(d[0]));
-      const bossGear = m.drops.find(d => G.isGear(d[0]));
-      const dropTxt = m.boss && bossGear ? `Drops: ${G.TIER[G.parseItem(bossGear[0]).tier].name}-Ausrüstung` : gear.length ? "Drops: " + gear.slice(0, 2).join(", ") : "Drops: Münzen, Essen";
+      const best = m.drops.filter(d => itemStyle(d[0])).sort((a, b) => G.baseValue(b[0]) - G.baseValue(a[0])).slice(0, 3).map(d => G.itemName(d[0]));
+      const dropTxt = best.length ? "Drops: " + best.join(", ") : "Drops: Münzen, Essen";
       b.innerHTML = `<img alt="" src="${monsterIcon(m)}">
         <span class="n">${esc(m.name)} <span style="color:${G.levelColour(c, m.lvl)}">(Stufe ${m.lvl})</span> ${m.boss ? '<span class="boss">BOSS</span>' : ""}</span>
         <span class="d">${esc(m.place)} · ${esc(dropTxt)}</span>
@@ -1509,6 +1580,7 @@
     if (t.dataset.tab === "loot") renderLoot();
   });
   document.querySelectorAll("#cats .btn").forEach(b => b.onclick = () => { shopCat = b.dataset.cat; renderShop(); });
+  document.querySelectorAll("#autoPrayRow .btn").forEach(b => b.onclick = () => { S.autoPray = b.dataset.ap === "1"; persist(); renderCombat(); autoProtect(); });
   document.querySelectorAll("#bonesRow .btn").forEach(b => b.onclick = () => { S.bonesTo = b.dataset.bones; persist(); renderCombat(); });
   document.querySelectorAll("#eatRow .btn").forEach(b => b.onclick = () => { S.eatAt = +b.dataset.eat; persist(); renderCombat(); });
 
@@ -1518,6 +1590,7 @@
     if (fighting) {
       if (F.dead && !F.respawn) spawnMonster(true);
       P.atkTimer = 1;
+      autoProtect();
       const m = mon();
       if (m.lvl > cmb() + 15) chat(`Vorsicht: ${esc(m.name)} ist viel stärker als du!`, "red");
     }

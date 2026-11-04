@@ -255,6 +255,17 @@ boar = first(H + "boarman/male.png", H + "boarman/adult.png") if any(f.startswit
 mon("darkbeast", [B + "muscular/black.png", boar, pants("black")], tints={0: ("#000000", "#2a2a2a", "#6a6a6a"), 1: ("#000000", "#2a2a2a", "#7a7a7a")}, slash=club_s, wtint=("#000000", "#3a2a2a", "#8a6a6a"))
 mon("kbd", [B + "muscular/black.png", first(H + "lizard/male.png"), helm_path("horned")], tints={0: ("#000000", "#1a1a1e", "#5a5a6a"), 1: ("#000000", "#22222a", "#6a6a7a"), 2: ("#000000", "#3a3a3a", "#c8c0b0")}, slash=sci_s, wtint=("#000000", "#2a2a30", "#8a8a9a"))
 
+# Zwischen-Bosse und Raid-Bosse (Version 10)
+mon("smokedevil", [B + "muscular/black.png", first(H + "alien/adult.png")], tints={0: ("#101010", "#5a5a58", "#b8b8b0"), 1: ("#101010", "#6a6a66", "#d0d0c8")})
+mon("kraken", [B + "muscular/black.png", first(H + "alien/adult.png"), pants("charcoal")], tints={0: ("#001018", "#1a6a7a", "#7ae0e8"), 1: ("#001018", "#2a7a8a", "#9af0f8")})
+mon("zulrah", [B + "muscular/black.png", first(H + "lizard/male.png")], tints={0: ("#001008", "#2a8a4a", "#a0f0a0"), 1: ("#001008", "#3a9a5a", "#b8ffb0")})
+mon("duke", [B + "muscular/black.png", first(H + "wartotaur/adult.png"), helm_path("horned")], tints={0: ("#000810", "#2a3a5a", "#8aa0d0"), 1: ("#000810", "#34466a", "#9ab0e0"), 2: ("#000000", "#3a3a4a", "#c8c8e0")}, slash=club_s, wtint=("#000010", "#2a3a5a", "#8aa0d0"))
+mon("corp", [B + "muscular/black.png", first(H + "wartotaur/adult.png")], tints={0: ("#101808", "#8a9a6a", "#f0f8d8"), 1: ("#101808", "#9aaa7a", "#ffffe8")})
+mon("nightmare", [B + "male/black.png", first(H + "vampire/adult.png"), legs_b, torso_b], tints={0: ("#08000c", "#3a1a4a", "#a070c0"), 1: ("#08000c", "#4a2a5a", "#b890d8"), 2: ("#000000", "#2a1a30", "#6a4a7a"), 3: ("#000000", "#2a1a30", "#6a4a7a")}, slash=sci_s, wtint=("#000000", "#3a1a4a", "#c090e0"))
+mon("olm", [B + "muscular/black.png", first(H + "lizard/male.png"), helm_path("horned")], tints={0: ("#181008", "#c8b8a0", "#fff8e8"), 1: ("#181008", "#d8c8b0", "#fffaf0"), 2: ("#200800", "#a04a10", "#ffb060")}, slash=club_s, wtint=("#180800", "#8a4a20", "#ffb070"))
+mon("verzik", [B + "female/black.png", first(H + "vampire/adult.png"), legs_b, torso_b, helm_path("horned")], tints={0: ("#100008", "#6a1a3a", "#e080a8"), 1: ("#100008", "#7a2a4a", "#f098c0"), 2: ("#080000", "#5a0a14", "#c03040"), 3: ("#080000", "#5a0a14", "#c03040"), 4: ("#080000", "#3a0a10", "#a02030")}, slash=sci_s, wtint=("#100000", "#7a1020", "#ff6070"))
+mon("warden", [B + "skeleton/skeleton.png", first(H + "skeleton/skeleton.png"), legs_b, torso_b, helm_path("spangenhelm")], tints={0: ("#1a1000", "#a08030", "#fff0a0"), 1: ("#1a1000", "#b09040", "#fff8b8"), 2: ("#100800", "#8a6a20", "#ffe080"), 3: ("#100800", "#8a6a20", "#ffe080"), 4: ("#100800", "#c8a040", "#fff0b0")}, slash=club_s, wtint=("#100800", "#c8a040", "#fff0b0"))
+
 # ---------------- Lizenz-Nachweis nur fuer die genutzten Dateien
 rows = []
 credits_txt = subprocess.run(["git", "-C", str(REPO), "show", "HEAD:CREDITS.csv"], capture_output=True, text=True).stdout
