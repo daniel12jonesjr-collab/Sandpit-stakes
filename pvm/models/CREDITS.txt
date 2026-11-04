@@ -1,0 +1,7 @@
+3D-Modelle in diesem Ordner: CC0 1.0 (Public Domain), Namensnennung nicht erforderlich.
+
+- Quaternius (https://quaternius.com): Figuren, Monster, Tiere, Waffen, Requisiten
+- Kenney (https://www.kenney.nl): Natur- und Deko-Modelle (Nature Kit u. a.)
+
+Bezogen als optimierte Kopien (meshopt) aus dem npm-Paket @netforge/asset-library-files 0.2.0,
+dessen NOTICE die Herkunft und CC0-Lizenz jedes Pakets belegt. Lizenztext: CC0-1.0.txt
