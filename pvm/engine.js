@@ -71,6 +71,16 @@
 
   // ---------------- Gebete (wie im Original)
   const PRAYERS = [
+    { id: "thick", name: "Thick Skin", lvl: 1, drain: .04, def: .05 },
+    { id: "burst", name: "Burst of Strength", lvl: 4, drain: .04, str: .05 },
+    { id: "clarity", name: "Clarity of Thought", lvl: 7, drain: .04, att: .05 },
+    { id: "sharp", name: "Sharp Eye", lvl: 8, drain: .04, range: .05 },
+    { id: "mwill", name: "Mystic Will", lvl: 9, drain: .04, mage: .05 },
+    { id: "rock", name: "Rock Skin", lvl: 10, drain: .07, def: .1 },
+    { id: "superh", name: "Superhuman Strength", lvl: 13, drain: .07, str: .1 },
+    { id: "improved", name: "Improved Reflexes", lvl: 16, drain: .07, att: .1 },
+    { id: "hawk", name: "Hawk Eye", lvl: 26, drain: .07, range: .1 },
+    { id: "mlore", name: "Mystic Lore", lvl: 27, drain: .07, mage: .1 },
     { id: "steel", name: "Steel Skin", lvl: 28, drain: .1, def: .15 },
     { id: "ustr", name: "Ultimate Strength", lvl: 31, drain: .1, str: .15 },
     { id: "irefl", name: "Incredible Reflexes", lvl: 34, drain: .1, att: .15 },
@@ -79,12 +89,15 @@
     { id: "pmelee", name: "Protect from Melee", lvl: 43, drain: .2, protect: "melee" },
     { id: "eagle", name: "Eagle Eye", lvl: 44, drain: .1, range: .15 },
     { id: "mystic", name: "Mystic Might", lvl: 45, drain: .1, mage: .15 },
+    { id: "chivalry", name: "Chivalry", lvl: 60, drain: .3, att: .15, str: .18, def: .2 },
     { id: "piety", name: "Piety", lvl: 70, drain: .4, att: .2, str: .23, def: .25 },
     { id: "rigour", name: "Rigour", lvl: 74, drain: .4, range: .23, def: .25 },
     { id: "augury", name: "Augury", lvl: 77, drain: .4, mage: .25, def: .25 },
   ];
   // Gruppen, die sich gegenseitig ausschliessen
-  const PRAYER_GROUP = { steel: "def", piety: "boost", rigour: "boost", augury: "boost", ustr: "str", irefl: "att", eagle: "range", mystic: "mage", pmage: "protect", prange: "protect", pmelee: "protect" };
+  const PRAYER_GROUP = { thick: "def", rock: "def", steel: "def", burst: "str", superh: "str", ustr: "str", clarity: "att", improved: "att", irefl: "att",
+    sharp: "range", hawk: "range", eagle: "range", mwill: "mage", mlore: "mage", mystic: "mage",
+    chivalry: "boost", piety: "boost", rigour: "boost", augury: "boost", pmage: "protect", prange: "protect", pmelee: "protect" };
   function prayerConflicts(a, b) {
     if (a === b) return false;
     const ga = PRAYER_GROUP[a], gb = PRAYER_GROUP[b];
@@ -145,6 +158,31 @@
     // Waffen
     abyssal_whip: U({ name: "Abyssal whip", slot: "melee", atk: 70, str: 72, req: ["att", 70], value: 2500000, sprite: "w_whip", col: "#4a1a4a" }),
     granite_maul: U({ name: "Granite maul", slot: "melee", atk: 58, str: 80, req: ["str", 50], value: 900000, sprite: "w_maul", col: "#6a6a6a" }),
+    // Magie-Waffen (spell = Max-Hit-Basis wie bei Stufen-Staeben)
+    ibans_staff: U({ name: "Iban's staff (u)", slot: "mage", set: "mage", atk: 20, spell: 19, req: ["mage", 50], value: 250000, shop: true, sprite: "w_mage5", col: "#6a4a8a" }),
+    trident_seas: U({ name: "Trident of the seas", slot: "mage", set: "mage", atk: 25, spell: 25, req: ["mage", 75], value: 1500000, sprite: "w_mage6", col: "#2ab8c8" }),
+    trident_swamp: U({ name: "Trident of the swamp", slot: "mage", set: "mage", atk: 25, spell: 28, req: ["mage", 75], value: 8000000, sprite: "w_mage7", col: "#3a8a3a" }),
+    kodai_wand: U({ name: "Kodai wand", slot: "mage", set: "mage", atk: 28, spell: 30, req: ["mage", 80], value: 40000000, sprite: "w_mage8", col: "#3a6ae0" }),
+    harmonised_staff: U({ name: "Harmonised nightmare staff", slot: "mage", set: "mage", atk: 30, spell: 32, req: ["mage", 82], value: 35000000, sprite: "w_mage8", col: "#8a6ac8" }),
+    sanguinesti_staff: U({ name: "Sanguinesti staff", slot: "mage", set: "mage", atk: 28, spell: 33, req: ["mage", 82], value: 60000000, sprite: "w_mage8", col: "#c82030" }),
+    // Weitere starke Waffen
+    toxic_blowpipe: U({ name: "Toxic blowpipe", slot: "range", atk: 66, rstr: 70, req: ["range", 75], value: 3000000, sprite: "w_range6", col: "#3ac040" }),
+    bow_faerdhinen: U({ name: "Bow of faerdhinen (c)", slot: "range", atk: 82, rstr: 82, req: ["range", 80], value: 40000000, sprite: "w_range5", col: "#e0c060" }),
+    saradomin_sword: U({ name: "Saradomin sword", slot: "melee", atk: 62, str: 70, req: ["att", 70], value: 2000000, sprite: "w_melee8", col: "#e8e8f0" }),
+    abyssal_tentacle: U({ name: "Abyssal tentacle", slot: "melee", atk: 76, str: 76, req: ["att", 75], value: 4000000, sprite: "w_whip", col: "#3a3a3a" }),
+    ghrazi_rapier: U({ name: "Ghrazi rapier", slot: "melee", atk: 82, str: 84, req: ["att", 80], value: 30000000, sprite: "w_melee6", col: "#c8c8d0" }),
+    // Magie-Schilde, Umhang, Schmuck (matk = Magie-Angriff, mdmg = Magie-Schaden in %)
+    mages_book: U({ name: "Mage's book", slot: "shield", set: "mage", matk: 15, value: 80000, shop: true, req: ["mage", 50], sprite: null, col: "#8a3a2a" }),
+    arcane_spirit_shield: U({ name: "Arcane spirit shield", slot: "shield", set: "mage", matk: 20, mdmg: 2, def: 60, value: 40000000, req: ["mage", 65], sprite: "p_shield9", col: "#e0c060" }),
+    elidinis_ward: U({ name: "Elidinis' ward (f)", slot: "shield", set: "mage", matk: 25, mdmg: 5, def: 55, value: 60000000, req: ["mage", 80], sprite: "p_shield8", col: "#c8a050" }),
+    imbued_zamorak_cape: U({ name: "Imbued zamorak cape", slot: "cape", set: "mage", matk: 15, mdmg: 2, def: 3, value: 300000, shop: true, req: ["mage", 75], capeAs: "obsidian_cape", col: "#c82020" }),
+    amulet_magic: U({ name: "Amulet of magic", slot: "neck", set: "mage", matk: 10, value: 3000, shop: true, col: "#3a6ae0" }),
+    god_book: U({ name: "Book of darkness", slot: "shield", set: "mage", matk: 10, mdmg: 1, def: 5, value: 150000, shop: true, req: ["mage", 30], sprite: null, col: "#3a2a3a" }),
+    tormented_bracelet: U({ name: "Tormented bracelet", slot: "hands", set: "mage", matk: 10, mdmg: 5, value: 15000000, req: ["mage", 75], sprite: null, col: "#8a3ac8" }),
+    magus_ring: U({ name: "Magus ring", slot: "ring", set: "mage", matk: 6, mdmg: 6, value: 12000000, req: ["mage", 80], col: "#3ac8e8" }),
+    virtus_mask: U({ name: "Virtus mask", slot: "helm", set: "mage", matk: 8, mdmg: 1, def: 10, value: 3000000, req: ["mage", 78], sprite: "p_ancestral_hat", col: "#2a3a6a" }),
+    virtus_robe_top: U({ name: "Virtus robe top", slot: "body", set: "mage", matk: 35, mdmg: 2, def: 45, value: 8000000, req: ["mage", 78], sprite: "p_ancestral_robe_top", col: "#2a3a6a" }),
+    virtus_robe_bottom: U({ name: "Virtus robe bottom", slot: "legs", set: "mage", matk: 26, mdmg: 2, def: 30, value: 6000000, req: ["mage", 78], sprite: "p_ancestral_robe_bottom", col: "#2a3a6a" }),
     dark_bow: U({ name: "Dark bow", slot: "range", atk: 78, rstr: 74, req: ["range", 60], value: 1800000, sprite: "w_darkbow", col: "#2a1a3a" }),
     // Amulette
     amulet_strength: U({ name: "Amulet of strength", slot: "neck", str: 10, value: 5000, shop: true, col: "#c84030" }),
@@ -260,15 +298,15 @@
     M({ id: "troll", name: "Ice troll", place: "Jatizso", lvl: 45, hp: 50, att: 40, def: 38, max: 11, gold: [150, 500], shape: "troll", col: "#a9c4d2", ground: "snow", size: 1.3, bones: "big_bones", drops: [["lobster", 2, 3], ["prayer_potion", 1, 12], [itemId("body", 4), 1, 60], [itemId("mage", 4), 1, 50], ["nature_rune", 12, 6], ["grimy_ranarr", 1, 20], ["warrior_ring", 1, 120]] }),
     M({ id: "firegiant", name: "Fire giant", place: "Brimhaven Dungeon", lvl: 62, hp: 65, att: 55, def: 52, max: 15, gold: [400, 1200], shape: "giant", col: "#d0602f", ground: "lava", size: 1.5, bones: "big_bones", drops: [["shark", 1, 4], ["prayer_potion", 1, 10], [itemId("melee", 5), 1, 60], [itemId("helm", 5), 1, 45], ["fire_cape", 1, 220], ["blood_rune", 8, 8], ["rune_bar", 1, 20], ["amulet_power", 1, 90]] }),
     M({ id: "hellhound", name: "Hellhound", place: "Taverley Dungeon", lvl: 80, hp: 80, att: 72, def: 68, max: 19, gold: [900, 2600], shape: "hound", col: "#3a1f1c", ground: "lava", size: 1.2, bones: "bones", drops: [["shark", 2, 3], ["prayer_potion", 1, 8], [itemId("range", 5), 1, 50], [itemId("legs", 6), 1, 120], ["death_rune", 15, 6], ["grimy_snapdragon", 1, 22], ["primordial_boots", 1, 800]] }),
-    M({ id: "demon", name: "Greater demon", place: "Chaos Tunnels", lvl: 100, hp: 100, att: 88, def: 84, max: 23, gold: [2000, 5000], shape: "demon", col: "#9b2020", ground: "lava", size: 1.5, bones: "big_bones", styles: [["melee", 3], ["mage", 1]], drops: [["shark", 2, 2], ["prayer_potion", 1, 6], [itemId("mage", 6), 1, 80], [itemId("shield", 6), 1, 70], ["blood_rune", 12, 5], ["rune_bar", 1, 12], ["seers_ring", 1, 260], ["infinity_hat", 1, 120], ["infinity_bottoms", 1, 160]] }),
+    M({ id: "demon", name: "Greater demon", place: "Chaos Tunnels", lvl: 100, hp: 100, att: 88, def: 84, max: 23, gold: [2000, 5000], shape: "demon", col: "#9b2020", ground: "lava", size: 1.5, bones: "big_bones", styles: [["melee", 3], ["mage", 1]], drops: [["shark", 2, 2], ["prayer_potion", 1, 6], [itemId("mage", 6), 1, 80], [itemId("shield", 6), 1, 70], ["blood_rune", 12, 5], ["rune_bar", 1, 12], ["seers_ring", 1, 260], ["infinity_hat", 1, 120], ["infinity_bottoms", 1, 160], ["tormented_bracelet", 1, 400], ["trident_seas", 1, 220]] }),
     M({ id: "gargoyle", name: "Gargoyle", place: "Slayer Tower", lvl: 111, hp: 105, att: 92, def: 110, max: 22, gold: [2500, 6000], shape: "gargoyle", col: "#6a6a64", ground: "crypt", size: 1.45, bones: "big_bones", drops: [["shark", 1, 3], ["granite_maul", 1, 80], ["rune_bar", 2, 8], ["adamantite_bar", 4, 6], ["berserker_ring", 1, 220], ["dragon_boots", 1, 140]] }),
-    M({ id: "abyssal", name: "Abyssal demon", place: "Slayer Tower", lvl: 124, hp: 150, att: 105, def: 95, max: 26, gold: [3000, 8000], shape: "abyssal", col: "#5a1a5a", ground: "crypt", size: 1.45, bones: "big_bones", drops: [["shark", 1, 3], ["abyssal_whip", 1, 90], ["blood_rune", 15, 5], ["death_rune", 20, 5], ["grimy_ranarr", 1, 8], ["occult_necklace", 1, 260], ["ranarr_seed", 1, 25], ["infinity_top", 1, 140]] }),
-    M({ id: "dragon", name: "Black dragon", place: "Taverley Dungeon", lvl: 125, hp: 130, att: 118, def: 102, max: 30, gold: [4000, 9000], shape: "dragon", col: "#2d2d33", ground: "cave", size: 1.6, bones: "dragon_bones", styles: [["melee", 2], ["mage", 1]], drops: [["manta", 1, 3], ["prayer_potion", 1, 5], [itemId("body", 6), 1, 45], [itemId("melee", 6), 1, 40], [itemId("helm", 6), 1, 35], [itemId("range", 6), 1, 50], ["rune_bar", 2, 6], ["draconic_visage", 1, 400], ["archers_ring", 1, 320]] }),
-    M({ id: "dharok", name: "Dharok the Wretched", place: "Barrows", lvl: 150, hp: 170, att: 142, def: 132, max: 38, gold: [7000, 15000], shape: "dharok", col: "#5f5a50", ground: "crypt", size: 1.15, boss: true, bones: "big_bones", drops: [["manta", 2, 2], ["prayer_potion", 2, 3], ...SLOT_KEYS.map(s => [itemId(s, 7), 1, 22]), ["amulet_fury", 1, 160], ["grimy_torstol", 2, 6], ["torstol_seed", 1, 25], ["karils_coif", 1, 40], ["karils_top", 1, 45], ["karils_skirt", 1, 45], ["ahrims_hood", 1, 40], ["ahrims_robetop", 1, 45], ["ahrims_robeskirt", 1, 45]] }),
-    M({ id: "darkbeast", name: "Dark beast", place: "Kourend Catacombs", lvl: 182, hp: 220, att: 150, def: 140, max: 40, gold: [9000, 20000], shape: "darkbeast", col: "#2a2a2a", ground: "swamp", size: 1.55, bones: "big_bones", drops: [["manta", 1, 3], ["dark_bow", 1, 70], ["death_rune", 40, 4], ["grimy_snapdragon", 1, 8], ["snapdragon_seed", 1, 30], ["necklace_anguish", 1, 300], ["eternal_boots", 1, 320], ["armadyl_helmet", 1, 120], ["armadyl_chainskirt", 1, 160]] }),
-    M({ id: "graardor", name: "General Graardor", place: "God Wars Dungeon", lvl: 185, hp: 210, att: 168, def: 152, max: 44, gold: [12000, 26000], shape: "ogre", col: "#7a6a4a", ground: "dirt", size: 1.8, boss: true, bones: "big_bones", styles: [["melee", 3], ["range", 1]], drops: [["manta", 2, 2], ["prayer_potion", 2, 3], ...SLOT_KEYS.map(s => [itemId(s, 8), 1, 26]), ["primordial_boots", 1, 110], ["amulet_torture", 1, 140], ["ultor_ring", 1, 260], ["ferocious_gloves", 1, 200], ["armadyl_chestplate", 1, 160]] }),
-    M({ id: "kbd", name: "King Black Dragon", place: "KBD Lair", lvl: 210, hp: 255, att: 178, def: 160, max: 48, gold: [15000, 35000], shape: "kbd", col: "#1a1a1e", ground: "lava", size: 2, boss: true, bones: "dragon_bones", styles: [["melee", 2], ["mage", 2]], drops: [["manta", 2, 2], ["draconic_visage", 1, 60], ["amulet_fury", 1, 90], ["rune_bar", 5, 3], ...SLOT_KEYS.filter(k => k !== "shield").map(k => [itemId(k, 6), 1, 14]), ["ancestral_hat", 1, 110]] }),
-    M({ id: "nex", name: "Nex", place: "Ancient Prison", lvl: 240, hp: 280, att: 196, def: 178, max: 52, gold: [25000, 60000], shape: "nex", col: "#4a3a6a", ground: "void", size: 1.5, boss: true, bones: "dragon_bones", styles: [["melee", 1], ["range", 1], ["mage", 1]], drops: [["manta", 3, 2], ["prayer_potion", 2, 2], ...SLOT_KEYS.map(s => [itemId(s, 9), 1, 30]), ["infernal_cape", 1, 120], ["torstol_seed", 2, 10], ["necklace_anguish", 1, 120], ["ultor_ring", 1, 150], ["masori_mask", 1, 60], ["masori_body", 1, 80], ["masori_chaps", 1, 70], ["ancestral_robe_top", 1, 80], ["ancestral_robe_bottom", 1, 70]] }),
+    M({ id: "abyssal", name: "Abyssal demon", place: "Slayer Tower", lvl: 124, hp: 150, att: 105, def: 95, max: 26, gold: [3000, 8000], shape: "abyssal", col: "#5a1a5a", ground: "crypt", size: 1.45, bones: "big_bones", drops: [["shark", 1, 3], ["abyssal_whip", 1, 90], ["blood_rune", 15, 5], ["death_rune", 20, 5], ["grimy_ranarr", 1, 8], ["occult_necklace", 1, 260], ["ranarr_seed", 1, 25], ["infinity_top", 1, 140], ["abyssal_tentacle", 1, 300], ["trident_seas", 1, 160], ["mages_book", 1, 120]] }),
+    M({ id: "dragon", name: "Black dragon", place: "Taverley Dungeon", lvl: 125, hp: 130, att: 118, def: 102, max: 30, gold: [4000, 9000], shape: "dragon", col: "#2d2d33", ground: "cave", size: 1.6, bones: "dragon_bones", styles: [["melee", 2], ["mage", 1]], drops: [["manta", 1, 3], ["prayer_potion", 1, 5], [itemId("body", 6), 1, 45], [itemId("melee", 6), 1, 40], [itemId("helm", 6), 1, 35], [itemId("range", 6), 1, 50], ["rune_bar", 2, 6], ["draconic_visage", 1, 400], ["archers_ring", 1, 320], ["trident_swamp", 1, 260], ["god_book", 1, 120]] }),
+    M({ id: "dharok", name: "Dharok the Wretched", place: "Barrows", lvl: 150, hp: 170, att: 142, def: 132, max: 38, gold: [7000, 15000], shape: "dharok", col: "#5f5a50", ground: "crypt", size: 1.15, boss: true, bones: "big_bones", drops: [["manta", 2, 2], ["prayer_potion", 2, 3], ...SLOT_KEYS.map(s => [itemId(s, 7), 1, 22]), ["amulet_fury", 1, 160], ["grimy_torstol", 2, 6], ["torstol_seed", 1, 25], ["karils_coif", 1, 40], ["karils_top", 1, 45], ["karils_skirt", 1, 45], ["ahrims_hood", 1, 40], ["ahrims_robetop", 1, 45], ["ahrims_robeskirt", 1, 45], ["harmonised_staff", 1, 160], ["saradomin_sword", 1, 60]] }),
+    M({ id: "darkbeast", name: "Dark beast", place: "Kourend Catacombs", lvl: 182, hp: 220, att: 150, def: 140, max: 40, gold: [9000, 20000], shape: "darkbeast", col: "#2a2a2a", ground: "swamp", size: 1.55, bones: "big_bones", drops: [["manta", 1, 3], ["dark_bow", 1, 70], ["death_rune", 40, 4], ["grimy_snapdragon", 1, 8], ["snapdragon_seed", 1, 30], ["necklace_anguish", 1, 300], ["eternal_boots", 1, 320], ["armadyl_helmet", 1, 120], ["armadyl_chainskirt", 1, 160], ["toxic_blowpipe", 1, 200], ["magus_ring", 1, 450], ["trident_swamp", 1, 300]] }),
+    M({ id: "graardor", name: "General Graardor", place: "God Wars Dungeon", lvl: 185, hp: 210, att: 168, def: 152, max: 44, gold: [12000, 26000], shape: "ogre", col: "#7a6a4a", ground: "dirt", size: 1.8, boss: true, bones: "big_bones", styles: [["melee", 3], ["range", 1]], drops: [["manta", 2, 2], ["prayer_potion", 2, 3], ...SLOT_KEYS.map(s => [itemId(s, 8), 1, 26]), ["primordial_boots", 1, 110], ["amulet_torture", 1, 140], ["ultor_ring", 1, 260], ["ferocious_gloves", 1, 200], ["armadyl_chestplate", 1, 160], ["kodai_wand", 1, 130], ["virtus_mask", 1, 50], ["virtus_robe_top", 1, 60], ["virtus_robe_bottom", 1, 60], ["saradomin_sword", 1, 40]] }),
+    M({ id: "kbd", name: "King Black Dragon", place: "KBD Lair", lvl: 210, hp: 255, att: 178, def: 160, max: 48, gold: [15000, 35000], shape: "kbd", col: "#1a1a1e", ground: "lava", size: 2, boss: true, bones: "dragon_bones", styles: [["melee", 2], ["mage", 2]], drops: [["manta", 2, 2], ["draconic_visage", 1, 60], ["amulet_fury", 1, 90], ["rune_bar", 5, 3], ...SLOT_KEYS.filter(k => k !== "shield").map(k => [itemId(k, 6), 1, 14]), ["ancestral_hat", 1, 110], ["arcane_spirit_shield", 1, 220], ["trident_swamp", 1, 120], ["magus_ring", 1, 250]] }),
+    M({ id: "nex", name: "Nex", place: "Ancient Prison", lvl: 240, hp: 280, att: 196, def: 178, max: 52, gold: [25000, 60000], shape: "nex", col: "#4a3a6a", ground: "void", size: 1.5, boss: true, bones: "dragon_bones", styles: [["melee", 1], ["range", 1], ["mage", 1]], drops: [["manta", 3, 2], ["prayer_potion", 2, 2], ...SLOT_KEYS.map(s => [itemId(s, 9), 1, 30]), ["infernal_cape", 1, 120], ["torstol_seed", 2, 10], ["necklace_anguish", 1, 120], ["ultor_ring", 1, 150], ["masori_mask", 1, 60], ["masori_body", 1, 80], ["masori_chaps", 1, 70], ["ancestral_robe_top", 1, 80], ["ancestral_robe_bottom", 1, 70], ["sanguinesti_staff", 1, 90], ["elidinis_ward", 1, 110], ["kodai_wand", 1, 90], ["bow_faerdhinen", 1, 100], ["ghrazi_rapier", 1, 100], ["tormented_bracelet", 1, 80]] }),
   ];
   function pickStyle(m) {
     const total = m.styles.reduce((a, s) => a + s[1], 0);
@@ -290,7 +328,7 @@
   function weaponOf(eq) {
     if (!eq.weapon) return { slot: "melee", tier: -1, atk: 0, str: 0, spell: 2 };
     const u = ITEMS[eq.weapon];
-    if (u) return { slot: u.slot, tier: 6, atk: u.atk, str: u.slot === "range" ? u.rstr : u.str, spell: SPELL[6], unique: true };
+    if (u) return { slot: u.slot, tier: u.spell ? Math.min(9, Math.max(5, Math.round((u.spell - 14) / 3) + 5)) : 6, atk: u.atk, str: u.slot === "range" ? u.rstr : u.str, spell: u.spell || SPELL[6], unique: true };
     const w = parseItem(eq.weapon);
     return { slot: w.slot, tier: w.tier, atk: W_ATK[w.tier], str: W_STR[w.tier], spell: SPELL[w.tier] };
   }
