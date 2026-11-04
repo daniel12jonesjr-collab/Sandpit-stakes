@@ -159,7 +159,7 @@
     abyssal_whip: U({ name: "Abyssal whip", slot: "melee", atk: 70, str: 72, req: ["att", 70], value: 2500000, sprite: "w_whip", col: "#4a1a4a" }),
     granite_maul: U({ name: "Granite maul", slot: "melee", atk: 58, str: 80, req: ["str", 50], value: 900000, sprite: "w_maul", col: "#6a6a6a" }),
     // Magie-Waffen (spell = Max-Hit-Basis wie bei Stufen-Staeben)
-    ibans_staff: U({ name: "Iban's staff (u)", slot: "mage", set: "mage", atk: 34, spell: 19, req: ["mage", 50], value: 250000, shop: true, sprite: "w_mage5", col: "#6a4a8a" }),
+    ibans_staff: U({ name: "Iban's staff (u)", slot: "mage", set: "mage", atk: 34, spell: 19, req: ["mage", 50], value: 90000, shop: true, sprite: "w_mage5", col: "#6a4a8a" }),
     trident_seas: U({ name: "Trident of the seas", slot: "mage", set: "mage", atk: 62, spell: 30, req: ["mage", 75], value: 1500000, sprite: "w_mage6", col: "#2ab8c8" }),
     trident_swamp: U({ name: "Trident of the swamp", slot: "mage", set: "mage", atk: 66, spell: 31, req: ["mage", 75], value: 8000000, sprite: "w_mage7", col: "#3a8a3a" }),
     kodai_wand: U({ name: "Kodai wand", slot: "mage", set: "mage", atk: 76, spell: 34, req: ["mage", 80], value: 40000000, sprite: "w_mage8", col: "#3a6ae0" }),
@@ -172,12 +172,12 @@
     abyssal_tentacle: U({ name: "Abyssal tentacle", slot: "melee", atk: 76, str: 76, req: ["att", 75], value: 4000000, sprite: "w_whip", col: "#3a3a3a" }),
     ghrazi_rapier: U({ name: "Ghrazi rapier", slot: "melee", atk: 82, str: 84, req: ["att", 80], value: 30000000, sprite: "w_melee6", col: "#c8c8d0" }),
     // Magie-Schilde, Umhang, Schmuck (matk = Magie-Angriff, mdmg = Magie-Schaden in %)
-    mages_book: U({ name: "Mage's book", slot: "shield", set: "mage", matk: 15, value: 80000, shop: true, req: ["mage", 50], sprite: null, col: "#8a3a2a" }),
+    mages_book: U({ name: "Mage's book", slot: "shield", set: "mage", matk: 15, value: 60000, shop: true, req: ["mage", 50], sprite: null, col: "#8a3a2a" }),
     arcane_spirit_shield: U({ name: "Arcane spirit shield", slot: "shield", set: "mage", matk: 20, mdmg: 2, def: 60, value: 40000000, req: ["mage", 65], sprite: "p_shield9", col: "#e0c060" }),
     elidinis_ward: U({ name: "Elidinis' ward (f)", slot: "shield", set: "mage", matk: 25, mdmg: 5, def: 55, value: 60000000, req: ["mage", 80], sprite: "p_shield8", col: "#c8a050" }),
     imbued_zamorak_cape: U({ name: "Imbued zamorak cape", slot: "cape", set: "mage", matk: 15, mdmg: 2, def: 3, value: 300000, shop: true, req: ["mage", 75], capeAs: "obsidian_cape", col: "#c82020" }),
     amulet_magic: U({ name: "Amulet of magic", slot: "neck", set: "mage", matk: 10, value: 3000, shop: true, col: "#3a6ae0" }),
-    god_book: U({ name: "Book of darkness", slot: "shield", set: "mage", matk: 10, mdmg: 1, def: 5, value: 150000, shop: true, req: ["mage", 30], sprite: null, col: "#3a2a3a" }),
+    god_book: U({ name: "Book of darkness", slot: "shield", set: "mage", matk: 10, mdmg: 1, def: 5, value: 12000, shop: true, req: ["mage", 30], sprite: null, col: "#3a2a3a" }),
     tormented_bracelet: U({ name: "Tormented bracelet", slot: "hands", set: "mage", matk: 10, mdmg: 5, value: 15000000, req: ["mage", 75], sprite: null, col: "#8a3ac8" }),
     magus_ring: U({ name: "Magus ring", slot: "ring", set: "mage", matk: 6, mdmg: 6, value: 12000000, req: ["mage", 80], col: "#3ac8e8" }),
     virtus_mask: U({ name: "Virtus mask", slot: "helm", set: "mage", matk: 8, mdmg: 1, def: 10, value: 3000000, req: ["mage", 78], sprite: "p_ancestral_hat", col: "#2a3a6a" }),

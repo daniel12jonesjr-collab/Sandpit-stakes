@@ -240,11 +240,13 @@
   .cats .btn { height: 32px; font-size: 13px; padding: 0 2px; }
   .shop { display: grid; gap: 3px; }
   .ware { display: grid; grid-template-columns: 36px 1fr auto; gap: 1px 8px; align-items: center; background: var(--slot); border: 1px solid #2a2218; padding: 4px 6px; }
-  .ware img { grid-row: 1 / 3; width: 32px; height: 32px; image-rendering: pixelated; }
+  .ware img { grid-row: 1 / 4; width: 32px; height: 32px; image-rendering: pixelated; }
   .ware .n { font-size: 14px; color: #fff; text-shadow: 1px 1px 0 #000; min-width: 0; }
   .ware .r { font-size: 13px; color: var(--muted); }
   .ware .r.no { color: #ff5050; }
-  .ware .buy { grid-row: 1 / 3; grid-column: 3; height: 36px; min-width: 84px; font-size: 14px; line-height: 1.1; }
+  .ware .bn { grid-column: 2; font-size: 13px; color: #9fe870; text-shadow: 1px 1px 0 #000; line-height: 1.25; }
+  .ware .bn i { font-style: normal; color: #e0d2ae; }
+  .ware .buy { grid-row: 1 / 4; grid-column: 3; height: 36px; min-width: 84px; font-size: 14px; line-height: 1.1; }
   .ware .buy b { display: block; color: var(--yellow); }
   .owned { color: var(--green); }
 
@@ -571,7 +573,7 @@
     abyssal_whip: U({ name: "Abyssal whip", slot: "melee", atk: 70, str: 72, req: ["att", 70], value: 2500000, sprite: "w_whip", col: "#4a1a4a" }),
     granite_maul: U({ name: "Granite maul", slot: "melee", atk: 58, str: 80, req: ["str", 50], value: 900000, sprite: "w_maul", col: "#6a6a6a" }),
     // Magie-Waffen (spell = Max-Hit-Basis wie bei Stufen-Staeben)
-    ibans_staff: U({ name: "Iban's staff (u)", slot: "mage", set: "mage", atk: 34, spell: 19, req: ["mage", 50], value: 250000, shop: true, sprite: "w_mage5", col: "#6a4a8a" }),
+    ibans_staff: U({ name: "Iban's staff (u)", slot: "mage", set: "mage", atk: 34, spell: 19, req: ["mage", 50], value: 90000, shop: true, sprite: "w_mage5", col: "#6a4a8a" }),
     trident_seas: U({ name: "Trident of the seas", slot: "mage", set: "mage", atk: 62, spell: 30, req: ["mage", 75], value: 1500000, sprite: "w_mage6", col: "#2ab8c8" }),
     trident_swamp: U({ name: "Trident of the swamp", slot: "mage", set: "mage", atk: 66, spell: 31, req: ["mage", 75], value: 8000000, sprite: "w_mage7", col: "#3a8a3a" }),
     kodai_wand: U({ name: "Kodai wand", slot: "mage", set: "mage", atk: 76, spell: 34, req: ["mage", 80], value: 40000000, sprite: "w_mage8", col: "#3a6ae0" }),
@@ -584,12 +586,12 @@
     abyssal_tentacle: U({ name: "Abyssal tentacle", slot: "melee", atk: 76, str: 76, req: ["att", 75], value: 4000000, sprite: "w_whip", col: "#3a3a3a" }),
     ghrazi_rapier: U({ name: "Ghrazi rapier", slot: "melee", atk: 82, str: 84, req: ["att", 80], value: 30000000, sprite: "w_melee6", col: "#c8c8d0" }),
     // Magie-Schilde, Umhang, Schmuck (matk = Magie-Angriff, mdmg = Magie-Schaden in %)
-    mages_book: U({ name: "Mage's book", slot: "shield", set: "mage", matk: 15, value: 80000, shop: true, req: ["mage", 50], sprite: null, col: "#8a3a2a" }),
+    mages_book: U({ name: "Mage's book", slot: "shield", set: "mage", matk: 15, value: 60000, shop: true, req: ["mage", 50], sprite: null, col: "#8a3a2a" }),
     arcane_spirit_shield: U({ name: "Arcane spirit shield", slot: "shield", set: "mage", matk: 20, mdmg: 2, def: 60, value: 40000000, req: ["mage", 65], sprite: "p_shield9", col: "#e0c060" }),
     elidinis_ward: U({ name: "Elidinis' ward (f)", slot: "shield", set: "mage", matk: 25, mdmg: 5, def: 55, value: 60000000, req: ["mage", 80], sprite: "p_shield8", col: "#c8a050" }),
     imbued_zamorak_cape: U({ name: "Imbued zamorak cape", slot: "cape", set: "mage", matk: 15, mdmg: 2, def: 3, value: 300000, shop: true, req: ["mage", 75], capeAs: "obsidian_cape", col: "#c82020" }),
     amulet_magic: U({ name: "Amulet of magic", slot: "neck", set: "mage", matk: 10, value: 3000, shop: true, col: "#3a6ae0" }),
-    god_book: U({ name: "Book of darkness", slot: "shield", set: "mage", matk: 10, mdmg: 1, def: 5, value: 150000, shop: true, req: ["mage", 30], sprite: null, col: "#3a2a3a" }),
+    god_book: U({ name: "Book of darkness", slot: "shield", set: "mage", matk: 10, mdmg: 1, def: 5, value: 12000, shop: true, req: ["mage", 30], sprite: null, col: "#3a2a3a" }),
     tormented_bracelet: U({ name: "Tormented bracelet", slot: "hands", set: "mage", matk: 10, mdmg: 5, value: 15000000, req: ["mage", 75], sprite: null, col: "#8a3ac8" }),
     magus_ring: U({ name: "Magus ring", slot: "ring", set: "mage", matk: 6, mdmg: 6, value: 12000000, req: ["mage", 80], col: "#3ac8e8" }),
     virtus_mask: U({ name: "Virtus mask", slot: "helm", set: "mage", matk: 8, mdmg: 1, def: 10, value: 3000000, req: ["mage", 78], sprite: "p_ancestral_hat", col: "#2a3a6a" }),
@@ -819,7 +821,7 @@
 <script>
 (() => {
   "use strict";
-  const VERSION = 8;
+  const VERSION = 9;
   const G = window.Grind;
   const $ = id => document.getElementById(id);
   const rnd = n => Math.floor(Math.random() * n);
@@ -855,6 +857,13 @@
   }
   let S = normalize(null);
   try { const raw = localStorage.getItem(KEY); if (raw) S = normalize(JSON.parse(raw)); } catch (e) {}
+  // Einmalige Erstattung: Iban's staff war in Version 5-8 zu teuer (275.000 statt 99.000)
+  let ibanRefund = false;
+  if (!S.ibanRefund) {
+    const has = S.inv.includes("ibans_staff") || S.bank.ibans_staff > 0 || S.eq.weapon === "ibans_staff";
+    if (has) { S.coins += 176000; ibanRefund = true; }
+    S.ibanRefund = true;
+  }
   let saveTimer = 0;
   function persist() { clearTimeout(saveTimer); saveTimer = setTimeout(() => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }, 300); }
 
@@ -1851,6 +1860,27 @@
   }
 
   let shopCat = "melee";
+  // Boni eines Items als kurzer Text fuer den Shop
+  function bonusText(id) {
+    const f = G.foodOf(id); if (f) return "";
+    if (G.potionOf(id)) return "";
+    const out = [], add = (label, v, unit = "") => { if (v) out.push(`<i>${label}</i> +${v}${unit}`); };
+    let u = G.ITEMS[id];
+    if (!u && G.isGear(id)) {
+      const { slot, tier } = G.parseItem(id);
+      if (slot === "melee") u = { slot, atk: G.W_ATK[tier], str: G.W_STR[tier] };
+      else if (slot === "range") u = { slot, atk: G.W_ATK[tier], rstr: G.W_STR[tier] };
+      else if (slot === "mage") u = { slot, atk: G.W_ATK[tier], spell: G.SPELL[tier] };
+      else u = { slot, def: Math.round(G.ARM[tier] * G.SLOTS[slot].mult) };
+    }
+    if (!u) return "";
+    if (u.slot === "melee") { add("Angriff", u.atk); add("Stärke", u.str); }
+    else if (u.slot === "range") { add("Fern", u.atk); add("Fern-Stärke", u.rstr); }
+    else if (u.slot === "mage") { add("Magie", u.atk); if (u.spell) out.push(`<i>Zauber-Schaden</i> ${u.spell}`); }
+    else { add("Angriff", u.atk); add("Fern", u.ratk); add("Magie", u.matk); add("Stärke", u.str); add("Fern-Stärke", u.rstr); add("Magie-Schaden", u.mdmg, "%"); }
+    add("Def", u.def);
+    return out.join(" · ");
+  }
   function renderShop() {
     const box = $("shop"); box.innerHTML = "";
     document.querySelectorAll("#cats .btn").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.cat === shopCat)));
@@ -1875,7 +1905,7 @@
     for (const r of rows) {
       if (r.info) { const n = document.createElement("div"); n.className = "sub"; n.style.marginTop = "6px"; n.textContent = "Barrows, Bandos, Torva, Karil's, Armadyl, Masori, Ahrim's, Infinity, Ancestral, Virtus, Tridents, Kodai, Sanguinesti und Co. gibt es nur als Drop."; box.appendChild(n); continue; }
       const el = document.createElement("div"); el.className = "ware";
-      el.innerHTML = `<img alt="" src="${icon(r.id)}"><span class="n">${esc(r.name)} ${r.owned ? '<span class="owned">✓</span>' : ""}</span><span class="r ${r.ok ? "" : "no"}">${esc(r.req)}</span>`;
+      el.innerHTML = `<img alt="" src="${icon(r.id)}"><span class="n">${esc(r.name)} ${r.owned ? '<span class="owned">✓</span>' : ""}</span><span class="r ${r.ok ? "" : "no"}">${esc(r.req)}</span>${bonusText(r.id) ? `<span class="bn">${bonusText(r.id)}</span>` : ""}`;
       const b = document.createElement("button"); b.className = "btn buy";
       if (r.food) {
         b.innerHTML = `<b>${fmt(r.price)}</b>Kaufen ×5`;
@@ -1965,6 +1995,7 @@
   F.style = G.pickStyle(mon());
   chat("Willkommen in Sandpit Grind!");
   chat("Tippe auf „Kämpfen“. Orte wechselst du über die Karte unten.");
+  if (ibanRefund) { chat("Erstattung: 176.000 Münzen für den zu teuren Iban's staff.", "gold"); renderCoins(); persist(); }
   requestAnimationFrame(frame);
 })();
 </script>
