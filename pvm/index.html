@@ -210,7 +210,14 @@
   .style[aria-pressed="true"] { background: linear-gradient(#7a2a1a, #5a1d12); color: var(--yellow); }
   .eat { margin-top: 12px; }
   .prayers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 4px; }
-  .pr { height: 50px; font-size: 12px; line-height: 1.15; padding: 0 2px; color: #f0e4c4; }
+  .prgrp { grid-column: 1 / -1; display: flex; align-items: center; gap: 6px; margin-top: 6px; font-size: 14px; color: var(--pc); text-shadow: 1px 1px 0 #000; border-bottom: 1px solid color-mix(in srgb, var(--pc) 45%, transparent); padding-bottom: 2px; }
+  .prgrp svg { width: 18px; height: 18px; }
+  .pr { min-height: 66px; height: auto; font-size: 12px; line-height: 1.15; padding: 4px 2px; color: #f0e4c4; display: grid; justify-items: center; align-content: center; gap: 2px; border-top: 3px solid var(--pc) !important; }
+  .pr svg { width: 20px; height: 20px; }
+  .pr .pn { display: block; }
+  .pr small { display: block; font-size: 11px; color: var(--pc); font-weight: 700; }
+  .pr:disabled svg { opacity: .45; filter: grayscale(.6); }
+  .pr:disabled small { color: #a8987a; font-weight: 400; }
   .pr[aria-pressed="true"] { background: radial-gradient(circle, rgba(255,255,200,.35), transparent 70%), linear-gradient(#6b5d48, #4a3f30); color: var(--yellow); box-shadow: inset 0 0 0 1px #fff3a0; }
   .pr:disabled { opacity: 1; color: #a8987a; background: linear-gradient(#3a3226, #2e271d); }
   .target .st { font-size: 13px; color: #fff; text-shadow: 1px 1px 0 #000; }
@@ -812,7 +819,7 @@
 <script>
 (() => {
   "use strict";
-  const VERSION = 6;
+  const VERSION = 7;
   const G = window.Grind;
   const $ = id => document.getElementById(id);
   const rnd = n => Math.floor(Math.random() * n);
@@ -1572,15 +1579,45 @@
     const pbox = $("prayers"); pbox.innerHTML = "";
     const plv = G.levelFor(S.xp.pray);
     $("ppText").textContent = `${Math.ceil(S.pp)} / ${maxPp()} Punkte`;
-    for (const p of G.PRAYERS) {
-      const b = document.createElement("button");
-      b.className = "btn pr"; b.disabled = plv < p.lvl;
-      b.setAttribute("aria-pressed", String(S.prayers.includes(p.id)));
-      b.innerHTML = p.name.replace("Protect from ", "Schutz ").replace("Missiles", "Fern").replace("Magic", "Magie").replace("Melee", "Nah") + (plv < p.lvl ? `<br><small>Stufe ${p.lvl}</small>` : "");
-      b.title = p.name;
-      b.onclick = () => togglePrayer(p.id);
-      pbox.appendChild(b);
+    const plv2 = plv;
+    for (const grp of PRAYER_GROUPS) {
+      const h = document.createElement("div"); h.className = "prgrp"; h.style.setProperty("--pc", grp.col);
+      h.innerHTML = `<svg viewBox="0 0 24 24"><use href="#s-${grp.icon}"/></svg>${grp.name}`;
+      pbox.appendChild(h);
+      for (const id of grp.ids) {
+        const p = G.PRAYERS.find(x => x.id === id); if (!p) continue;
+        const col = p.protect ? STYLE_COL[p.protect] : grp.col, ic = p.protect ? STYLE_ICON[p.protect] : grp.icon;
+        const b = document.createElement("button");
+        b.className = "btn pr"; b.disabled = plv2 < p.lvl; b.style.setProperty("--pc", col);
+        b.setAttribute("aria-pressed", String(S.prayers.includes(p.id)));
+        b.innerHTML = `<svg viewBox="0 0 24 24"><use href="#s-${ic}"/></svg><span class="pn">${esc(prayerShort(p))}</span><small>${plv2 < p.lvl ? "Stufe " + p.lvl : esc(prayerEffect(p))}</small>`;
+        b.title = p.name + " – " + prayerEffect(p);
+        b.onclick = () => togglePrayer(p.id);
+        pbox.appendChild(b);
+      }
     }
+  }
+  const STYLE_COL = { melee: "#ff5a3a", range: "#5ad040", mage: "#5a9aff", def: "#c8ccd0" };
+  const STYLE_ICON = { melee: "att", range: "range", mage: "mage" };
+  const PRAYER_GROUPS = [
+    { name: "Nahkampf", col: STYLE_COL.melee, icon: "att", ids: ["burst", "clarity", "superh", "improved", "ustr", "irefl", "chivalry", "piety"] },
+    { name: "Fernkampf", col: STYLE_COL.range, icon: "range", ids: ["sharp", "hawk", "eagle", "rigour"] },
+    { name: "Magie", col: STYLE_COL.mage, icon: "mage", ids: ["mwill", "mlore", "mystic", "augury"] },
+    { name: "Verteidigung", col: STYLE_COL.def, icon: "def", ids: ["thick", "rock", "steel"] },
+    { name: "Schutz vor Angriffen", col: "#ffff00", icon: "pray", ids: ["pmelee", "prange", "pmage"] },
+  ];
+  function prayerShort(p) {
+    return p.protect ? { melee: "Schutz Nah", range: "Schutz Fern", mage: "Schutz Magie" }[p.protect] : p.name;
+  }
+  function prayerEffect(p) {
+    if (p.protect) return "blockt " + { melee: "Nah", range: "Fern", mage: "Magie" }[p.protect];
+    const pc = v => Math.round(v * 100) + "%";
+    const parts = [];
+    if (p.att && p.str) parts.push("Nah +" + pc(p.str)); else { if (p.att) parts.push("Angriff +" + pc(p.att)); if (p.str) parts.push("Stärke +" + pc(p.str)); }
+    if (p.range) parts.push("Fern +" + pc(p.range));
+    if (p.mage) parts.push("Magie +" + pc(p.mage));
+    if (p.def) parts.push("Def +" + pc(p.def));
+    return parts.join(" · ");
   }
 
   function togglePrayer(id) {
