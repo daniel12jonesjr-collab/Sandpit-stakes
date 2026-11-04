@@ -298,7 +298,13 @@
       <div class="eat">
         <div class="lbl">Gebete <span id="ppText" style="color:#9fd8ff"></span></div>
         <div class="prayers" id="prayers"></div>
-        <div class="note" style="margin-top:4px">Knochen von Gegnern werden automatisch vergraben und geben Gebet-XP.</div>
+      </div>
+      <div class="eat">
+        <div class="lbl">Knochen</div>
+        <div class="row3" id="bonesRow" style="grid-template-columns:repeat(3,1fr)">
+          <button class="btn" data-bones="bury">Vergraben</button><button class="btn" data-bones="inv">Inventar</button><button class="btn" data-bones="bank">Bank</button>
+        </div>
+        <div class="note" style="margin-top:4px">Vergraben gibt sofort Gebet-XP. Inventar oder Bank: zum Verkaufen oder später vergraben (ist das Inventar voll, gehen sie in die Bank).</div>
       </div>
       <div class="eat">
         <div class="lbl">Automatisch essen bei</div>
@@ -806,7 +812,7 @@
 <script>
 (() => {
   "use strict";
-  const VERSION = 5;
+  const VERSION = 6;
   const G = window.Grind;
   const $ = id => document.getElementById(id);
   const rnd = n => Math.floor(Math.random() * n);
@@ -825,7 +831,7 @@
       xp: { att: 0, str: 0, def: 0, range: 0, mage: 0, pray: 0, hp: G.XP_TABLE[10] },
       hp: 10, pp: 1, prayers: [], coins: 100, inv, bank: {},
       eq: { weapon: "melee:0", helm: null, body: null, legs: null, shield: null },
-      style: "acc", spot: 0, kills: {}, eatAt: 50, fast: false, totalXp: 0, deaths: 0,
+      style: "acc", spot: 0, kills: {}, eatAt: 50, bonesTo: "bury", fast: false, totalXp: 0, deaths: 0,
     };
   }
   function normalize(o) {
@@ -1292,8 +1298,8 @@
     S.coins += gold;
     const drops = [["coins", gold]];
     if (m.bones) drops.push([m.bones, 1]);
-    // Knochen werden automatisch vergraben (wie ein Bonecrusher)
-    if (m.bones) { const bn = G.bonesOf(m.bones); gainXp({ pray: Math.round(bn.xp * G.XP_RATE) }); }
+    // Knochen: je nach Einstellung sofort vergraben oder behalten (Inventar/Bank)
+    if (m.bones && S.bonesTo === "bury") { const bn = G.bonesOf(m.bones); gainXp({ pray: Math.round(bn.xp * G.XP_RATE) }); }
     const table = m.drops.concat(m.lvl >= 17 ? G.RARE_TABLE : []);
     for (const [id, qty, rate] of table) {
       if (Math.random() >= 1 / rate) continue;
@@ -1306,7 +1312,7 @@
     let best = 0;
     for (const d of drops) {
       const [id, n] = d;
-      d[2] = id === "coins" ? "coins" : id === m.bones ? "bury" : addLoot(id, n);
+      d[2] = id === "coins" ? "coins" : id === m.bones ? (S.bonesTo === "bury" ? "bury" : S.bonesTo === "bank" ? (bankAdd(id, n), "bank") : addLoot(id, n)) : addLoot(id, n);
       const v = id === "coins" ? n : G.baseValue(id) * n;
       T.gp += v; if (id !== "coins") T.items[id] = (T.items[id] || 0) + n;
       if (id !== "coins") best = Math.max(best, v);
@@ -1562,6 +1568,7 @@
       box.appendChild(b);
     }
     document.querySelectorAll("#eatRow .btn").forEach(b => b.setAttribute("aria-pressed", String(+b.dataset.eat === S.eatAt)));
+    document.querySelectorAll("#bonesRow .btn").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.bones === S.bonesTo)));
     const pbox = $("prayers"); pbox.innerHTML = "";
     const plv = G.levelFor(S.xp.pray);
     $("ppText").textContent = `${Math.ceil(S.pp)} / ${maxPp()} Punkte`;
@@ -1659,6 +1666,14 @@
     chat(`Du isst: ${esc(f.name)}.`); animate(P, "eat"); P.atkTimer += 2;
     renderInv(); persist();
   }
+  function buryXp(id, n) { gainXp({ pray: Math.round(G.bonesOf(id).xp * G.XP_RATE * n) }); }
+  function buryAllInv() {
+    let n = 0; const xp = {};
+    S.inv.forEach((id, k) => { if (G.bonesOf(id)) { xp[id] = (xp[id] || 0) + 1; S.inv[k] = null; n++; } });
+    for (const id in xp) buryXp(id, xp[id]);
+    if (n) { chat(`Du vergräbst ${n} Knochen.`); animate(P, "eat"); }
+    renderInv(); persist();
+  }
   function bury(i) {
     const b = G.bonesOf(S.inv[i]); if (!b) return;
     S.inv[i] = null; chat("Du vergräbst die Knochen.");
@@ -1715,7 +1730,7 @@
       const slot = u ? u.slot : G.parseItem(id).slot;
       items.push({ label: ["melee", "range", "mage"].includes(slot) ? "Führen" : "Tragen", fn: () => equip(i) });
     } else if (u && u.clue) items.push({ label: "Öffnen", fn: () => openClue(i) });
-    else if (G.bonesOf(id)) items.push({ label: "Vergraben", fn: () => bury(i) });
+    else if (G.bonesOf(id)) { items.push({ label: "Vergraben", fn: () => bury(i) }); items.push({ label: "Alle vergraben", fn: () => buryAllInv() }); }
     else if (G.potionOf(id)) items.push({ label: "Trinken", fn: () => drinkAt(i) });
     else if (G.foodOf(id)) items.push({ label: "Essen", fn: () => eat(i) });
     if (canAlch(id)) items.push({ label: `High Alch (${fmt(G.highAlch(id))})`, fn: () => alch(id, () => { S.inv[i] = null; }) });
@@ -1729,6 +1744,7 @@
       { label: "Abheben", fn: () => { if (invAdd(id)) { S.bank[id]--; renderInv(); renderBank(); persist(); } else chat("Dein Inventar ist voll.", "red"); } },
       { label: "Alle abheben", fn: () => { let k = 0; while (S.bank[id] > 0 && invAdd(id)) { S.bank[id]--; k++; } if (!k) chat("Dein Inventar ist voll.", "red"); renderInv(); renderBank(); persist(); } },
       ...(canAlch(id) ? [{ label: `High Alch (${fmt(G.highAlch(id))})`, fn: () => alch(id, () => { S.bank[id]--; }) }] : []),
+      ...(G.bonesOf(id) ? [{ label: `Alle vergraben (${n})`, fn: () => { buryXp(id, n); S.bank[id] = 0; chat(`Du vergräbst ${n}× ${esc(G.itemName(id))}.`); renderBank(); persist(); } }] : []),
       { label: `Alle verkaufen (${fmt(G.sellPrice(id) * n)})`, fn: () => { S.coins += G.sellPrice(id) * n; S.bank[id] = 0; chat(`Verkauft: ${n}× ${esc(G.itemName(id))}.`, "gold"); renderBank(); renderCoins(); persist(); } },
     ]);
   }
@@ -1849,6 +1865,7 @@
     if (t.dataset.tab === "loot") renderLoot();
   });
   document.querySelectorAll("#cats .btn").forEach(b => b.onclick = () => { shopCat = b.dataset.cat; renderShop(); });
+  document.querySelectorAll("#bonesRow .btn").forEach(b => b.onclick = () => { S.bonesTo = b.dataset.bones; persist(); renderCombat(); });
   document.querySelectorAll("#eatRow .btn").forEach(b => b.onclick = () => { S.eatAt = +b.dataset.eat; persist(); renderCombat(); });
 
   $("fightBtn").onclick = () => {
