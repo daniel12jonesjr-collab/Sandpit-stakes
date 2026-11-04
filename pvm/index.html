@@ -571,12 +571,12 @@
     abyssal_whip: U({ name: "Abyssal whip", slot: "melee", atk: 70, str: 72, req: ["att", 70], value: 2500000, sprite: "w_whip", col: "#4a1a4a" }),
     granite_maul: U({ name: "Granite maul", slot: "melee", atk: 58, str: 80, req: ["str", 50], value: 900000, sprite: "w_maul", col: "#6a6a6a" }),
     // Magie-Waffen (spell = Max-Hit-Basis wie bei Stufen-Staeben)
-    ibans_staff: U({ name: "Iban's staff (u)", slot: "mage", set: "mage", atk: 20, spell: 19, req: ["mage", 50], value: 250000, shop: true, sprite: "w_mage5", col: "#6a4a8a" }),
-    trident_seas: U({ name: "Trident of the seas", slot: "mage", set: "mage", atk: 25, spell: 25, req: ["mage", 75], value: 1500000, sprite: "w_mage6", col: "#2ab8c8" }),
-    trident_swamp: U({ name: "Trident of the swamp", slot: "mage", set: "mage", atk: 25, spell: 28, req: ["mage", 75], value: 8000000, sprite: "w_mage7", col: "#3a8a3a" }),
-    kodai_wand: U({ name: "Kodai wand", slot: "mage", set: "mage", atk: 28, spell: 30, req: ["mage", 80], value: 40000000, sprite: "w_mage8", col: "#3a6ae0" }),
-    harmonised_staff: U({ name: "Harmonised nightmare staff", slot: "mage", set: "mage", atk: 30, spell: 32, req: ["mage", 82], value: 35000000, sprite: "w_mage8", col: "#8a6ac8" }),
-    sanguinesti_staff: U({ name: "Sanguinesti staff", slot: "mage", set: "mage", atk: 28, spell: 33, req: ["mage", 82], value: 60000000, sprite: "w_mage8", col: "#c82030" }),
+    ibans_staff: U({ name: "Iban's staff (u)", slot: "mage", set: "mage", atk: 34, spell: 19, req: ["mage", 50], value: 250000, shop: true, sprite: "w_mage5", col: "#6a4a8a" }),
+    trident_seas: U({ name: "Trident of the seas", slot: "mage", set: "mage", atk: 62, spell: 30, req: ["mage", 75], value: 1500000, sprite: "w_mage6", col: "#2ab8c8" }),
+    trident_swamp: U({ name: "Trident of the swamp", slot: "mage", set: "mage", atk: 66, spell: 31, req: ["mage", 75], value: 8000000, sprite: "w_mage7", col: "#3a8a3a" }),
+    kodai_wand: U({ name: "Kodai wand", slot: "mage", set: "mage", atk: 76, spell: 34, req: ["mage", 80], value: 40000000, sprite: "w_mage8", col: "#3a6ae0" }),
+    harmonised_staff: U({ name: "Harmonised nightmare staff", slot: "mage", set: "mage", atk: 80, spell: 35, req: ["mage", 82], value: 35000000, sprite: "w_mage8", col: "#8a6ac8" }),
+    sanguinesti_staff: U({ name: "Sanguinesti staff", slot: "mage", set: "mage", atk: 78, spell: 36, req: ["mage", 82], value: 60000000, sprite: "w_mage8", col: "#c82030" }),
     // Weitere starke Waffen
     toxic_blowpipe: U({ name: "Toxic blowpipe", slot: "range", atk: 66, rstr: 70, req: ["range", 75], value: 3000000, sprite: "w_range6", col: "#3ac040" }),
     bow_faerdhinen: U({ name: "Bow of faerdhinen (c)", slot: "range", atk: 82, rstr: 82, req: ["range", 80], value: 40000000, sprite: "w_range5", col: "#e0c060" }),
@@ -819,7 +819,7 @@
 <script>
 (() => {
   "use strict";
-  const VERSION = 7;
+  const VERSION = 8;
   const G = window.Grind;
   const $ = id => document.getElementById(id);
   const rnd = n => Math.floor(Math.random() * n);
