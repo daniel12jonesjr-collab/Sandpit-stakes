@@ -135,7 +135,7 @@
 
   /* ---------- Seitenpanel */
   .side { background: var(--panel); border: 2px solid var(--edge); box-shadow: inset 0 0 0 2px var(--panel-hi), inset 0 0 0 4px var(--panel-dark); border-radius: 4px; padding: 6px; }
-  .tabs { display: grid; grid-template-columns: repeat(8, 1fr); gap: 3px; margin-bottom: 6px; }
+  .tabs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 3px; margin-bottom: 6px; }
   .tab {
     height: 40px; display: grid; place-items: center; cursor: pointer;
     background: linear-gradient(#4f4434, #3a3126); border: 2px solid var(--edge); border-radius: 3px;
@@ -181,10 +181,16 @@
   .skillinfo { margin-top: 8px; font-size: 13px; color: #fff; text-shadow: 1px 1px 0 #000; min-height: 34px; text-align: center; }
 
   /* Ausruestung */
-  .equip { display: grid; grid-template-columns: repeat(3, 64px); grid-template-rows: repeat(3, 58px); gap: 6px; justify-content: center; margin-bottom: 10px; }
+  .equip { display: grid; grid-template-columns: repeat(3, 60px); grid-template-rows: repeat(5, 50px); gap: 6px; justify-content: center; margin-bottom: 10px; }
   .eslot { background: var(--slot); border: 1px solid #2a2218; display: grid; place-items: center; cursor: pointer; position: relative; }
   .eslot img { width: 80%; height: 80%; image-rendering: pixelated; }
   .eslot .ph { font-size: 10px; color: #7a6d58; text-align: center; }
+  .lootmon { background: var(--slot); border: 1px solid #2a2218; padding: 6px; margin-bottom: 4px; }
+  .lootmon .hd2 { display: flex; justify-content: space-between; font-size: 14px; color: var(--yellow); text-shadow: 1px 1px 0 #000; }
+  .lootmon .hd2 b { color: var(--orange); font-weight: 500; }
+  .lootgrid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 3px; margin-top: 4px; }
+  .lootgrid .slot { aspect-ratio: 1; }
+  .grounditem { position: absolute; transform: translate(-50%, -100%); font-size: 11px; text-shadow: 1px 1px 0 #000; white-space: nowrap; pointer-events: none; }
   .bonuses { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; font-size: 13px; color: var(--orange); text-shadow: 1px 1px 0 #000; padding: 0 6px; }
   .bonuses b { color: var(--yellow); text-align: right; font-weight: 500; }
 
@@ -217,7 +223,7 @@
   .boss { color: #ff7a1a; font-size: 11px; }
 
   /* Shop */
-  .cats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-bottom: 6px; }
+  .cats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; margin-bottom: 6px; }
   .cats .btn { height: 32px; font-size: 13px; padding: 0 2px; }
   .shop { display: grid; gap: 3px; }
   .ware { display: grid; grid-template-columns: 36px 1fr auto; gap: 1px 8px; align-items: center; background: var(--slot); border: 1px solid #2a2218; padding: 4px 6px; }
@@ -276,6 +282,7 @@
       <button class="tab" data-tab="bank" aria-pressed="false" title="Bank"><svg viewBox="0 0 24 24"><use href="#t-bank"/></svg></button>
       <button class="tab" data-tab="places" aria-pressed="false" title="Orte"><svg viewBox="0 0 24 24"><use href="#t-map"/></svg></button>
       <button class="tab" data-tab="shop" aria-pressed="false" title="Shop"><svg viewBox="0 0 24 24"><use href="#t-shop"/></svg></button>
+      <button class="tab" data-tab="loot" aria-pressed="false" title="Loot-Tracker"><svg viewBox="0 0 24 24"><use href="#t-loot"/></svg></button>
       <button class="tab" data-tab="opts" aria-pressed="false" title="Optionen"><svg viewBox="0 0 24 24"><use href="#t-opts"/></svg></button>
     </div>
 
@@ -328,10 +335,17 @@
         <button class="btn" data-cat="melee" aria-pressed="true">Nah</button>
         <button class="btn" data-cat="range" aria-pressed="false">Fern</button>
         <button class="btn" data-cat="mage" aria-pressed="false">Magie</button>
-        <button class="btn" data-cat="armour" aria-pressed="false">Rüstung</button>
+        <button class="btn" data-cat="armour" aria-pressed="false">Platte</button>
+        <button class="btn" data-cat="acc" aria-pressed="false">Zubehör</button>
         <button class="btn" data-cat="food" aria-pressed="false">Essen</button>
       </div>
       <div class="shop" id="shop"></div>
+    </div>
+
+    <div class="panel" data-panel="loot" hidden>
+      <div class="ptitle">Loot-Tracker</div>
+      <div class="sub" id="lootSum"></div>
+      <div id="lootList"></div>
     </div>
 
     <div class="panel" data-panel="opts" hidden>
@@ -361,6 +375,7 @@
     <g id="t-bank"><rect x="3" y="9" width="18" height="12" fill="#8a6234" stroke="#000"/><path d="M3 9 Q12 2 21 9" fill="#a5773e" stroke="#000"/><rect x="10" y="12" width="4" height="4" fill="#e0c23a" stroke="#000"/></g>
     <g id="t-map"><path d="M3 5 L9 3 L15 5 L21 3 L21 19 L15 21 L9 19 L3 21 Z" fill="#cfbd92" stroke="#000"/><path d="M9 3 L9 19 M15 5 L15 21" stroke="#8a7a5f"/><circle cx="12" cy="11" r="2" fill="#d8402f"/></g>
     <g id="t-shop"><ellipse cx="12" cy="18" rx="8" ry="3" fill="#b8870f" stroke="#000"/><ellipse cx="9" cy="14" rx="5" ry="2.2" fill="#f2c230" stroke="#000"/><ellipse cx="15" cy="12" rx="5" ry="2.2" fill="#f5cf45" stroke="#000"/><ellipse cx="12" cy="8" rx="5" ry="2.2" fill="#ffe27a" stroke="#000"/></g>
+    <g id="t-loot"><rect x="3" y="10" width="18" height="11" fill="#8a6234" stroke="#000"/><path d="M3 10 L6 5 L18 5 L21 10 Z" fill="#a5773e" stroke="#000"/><circle cx="12" cy="14" r="2.5" fill="#ffd700" stroke="#000"/><path d="M19 2 L20 4 L22 4 L20.5 5.5 L21 8 L19 6.5 L17 8 L17.5 5.5 L16 4 L18 4 Z" fill="#fff36a"/></g>
     <g id="t-opts"><circle cx="12" cy="12" r="6" fill="none" stroke="#c9b995" stroke-width="3"/><g stroke="#c9b995" stroke-width="3" stroke-linecap="round"><path d="M12 2 L12 5 M12 19 L12 22 M2 12 L5 12 M19 12 L22 12 M5 5 L7 7 M17 17 L19 19 M5 19 L7 17 M17 7 L19 5"/></g></g>
     <g id="s-att"><path d="M5 19 L17 7 L19 5 L18 9 L7 20 Z" fill="#c9cdd2" stroke="#000"/><path d="M4 16 L8 20" stroke="#b8870f" stroke-width="2.6"/></g>
     <g id="s-str"><path d="M5 10 Q12 4 19 10 L17 13 Q12 9 7 13 Z" fill="#2fa83a" stroke="#000"/><rect x="9" y="12" width="6" height="9" fill="#2fa83a" stroke="#000"/></g>
@@ -407,7 +422,7 @@
     { name: "Torva", req: 80, c: ["#6a3030", "#3a1a18"] },
   ];
   const NAMES = {
-    melee: ["Bronze scimitar", "Iron scimitar", "Steel scimitar", "Mithril scimitar", "Adamant scimitar", "Rune scimitar", "Dragon scimitar", "Abyssal whip", "Bandos godsword", "Scythe of vitur"],
+    melee: ["Bronze scimitar", "Iron scimitar", "Steel scimitar", "Mithril scimitar", "Adamant scimitar", "Rune scimitar", "Dragon scimitar", "Dharok's greataxe", "Bandos godsword", "Scythe of vitur"],
     range: ["Shortbow", "Oak shortbow", "Willow shortbow", "Maple shortbow", "Yew shortbow", "Magic shortbow", "Dragon crossbow", "Karil's crossbow", "Armadyl crossbow", "Twisted bow"],
     mage: ["Staff of air", "Staff of water", "Staff of earth", "Staff of fire", "Battlestaff", "Mystic fire staff", "Ancient staff", "Ahrim's staff", "Staff of the dead", "Tumeken's shadow"],
     helm: ["Bronze full helm", "Iron full helm", "Steel full helm", "Mithril full helm", "Adamant full helm", "Rune full helm", "Dragon full helm", "Dharok's helm", "Neitiznot faceguard", "Torva full helm"],
@@ -475,6 +490,129 @@
     return b;
   }
 
+  // ---------------- Einzigartige Items (Member-Items) und Materialien
+  // Boni: atk = Angriff (alle Stile), str = Nahkampf-Staerke, rstr = Fernkampf-Staerke, mdmg = Magie-Schaden in %, def = Verteidigung
+  const U = (o) => Object.assign({ atk: 0, ratk: 0, matk: 0, str: 0, rstr: 0, mdmg: 0, def: 0 }, o);
+  // Ruestungs-Sets fuer Fernkampf und Magie: [id, Name, Slot, Stufe, ratk/matk, rstr/mdmg, def, Wert, Farbe, Quelle]
+  const SETS = [
+    // Fernkampf
+    ["coif", "Coif", "helm", ["range", 20], 2, 0, 4, 2000, "#8a6234", "shop"],
+    ["green_dhide_body", "Green d'hide body", "body", ["range", 40], 15, 0, 20, 8000, "#3a7a2a", "shop"],
+    ["green_dhide_chaps", "Green d'hide chaps", "legs", ["range", 40], 8, 0, 10, 4000, "#3a7a2a", "shop"],
+    ["green_dhide_vambs", "Green d'hide vambraces", "hands", ["range", 40], 8, 0, 3, 2000, "#3a7a2a", "shop"],
+    ["blue_dhide_body", "Blue d'hide body", "body", ["range", 50], 20, 0, 26, 20000, "#2a4a9a", "shop"],
+    ["blue_dhide_chaps", "Blue d'hide chaps", "legs", ["range", 50], 11, 0, 14, 10000, "#2a4a9a", "shop"],
+    ["red_dhide_body", "Red d'hide body", "body", ["range", 60], 25, 0, 32, 45000, "#9a2a2a", "shop"],
+    ["red_dhide_chaps", "Red d'hide chaps", "legs", ["range", 60], 14, 0, 18, 22000, "#9a2a2a", "shop"],
+    ["black_dhide_body", "Black d'hide body", "body", ["range", 70], 30, 0, 38, 80000, "#2a2a2e", "shop"],
+    ["black_dhide_chaps", "Black d'hide chaps", "legs", ["range", 70], 17, 0, 22, 40000, "#2a2a2e", "shop"],
+    ["black_dhide_vambs", "Black d'hide vambraces", "hands", ["range", 70], 11, 1, 6, 15000, "#2a2a2e", "shop"],
+    ["karils_coif", "Karil's coif", "helm", ["range", 70], 7, 0, 8, 300000, "#5a5a4a", "drop"],
+    ["karils_top", "Karil's leathertop", "body", ["range", 70], 30, 0, 45, 1200000, "#5a5a4a", "drop"],
+    ["karils_skirt", "Karil's leatherskirt", "legs", ["range", 70], 19, 0, 27, 600000, "#5a5a4a", "drop"],
+    ["armadyl_helmet", "Armadyl helmet", "helm", ["range", 75], 10, 0, 12, 4000000, "#e8e0c0", "drop"],
+    ["armadyl_chestplate", "Armadyl chestplate", "body", ["range", 75], 33, 1, 55, 20000000, "#e8e0c0", "drop"],
+    ["armadyl_chainskirt", "Armadyl chainskirt", "legs", ["range", 75], 20, 1, 32, 20000000, "#e8e0c0", "drop"],
+    ["masori_mask", "Masori mask (f)", "helm", ["range", 80], 12, 2, 14, 15000000, "#c8a050", "drop"],
+    ["masori_body", "Masori body (f)", "body", ["range", 80], 43, 4, 60, 80000000, "#c8a050", "drop"],
+    ["masori_chaps", "Masori chaps (f)", "legs", ["range", 80], 27, 2, 36, 50000000, "#c8a050", "drop"],
+    // Magie
+    ["wizard_hat", "Wizard hat", "helm", ["mage", 1], 2, 0, 0, 500, "#2a3aa0", "shop"],
+    ["wizard_robe_top", "Wizard robe top", "body", ["mage", 1], 3, 0, 0, 800, "#2a3aa0", "shop"],
+    ["wizard_robe_skirt", "Blue skirt", "legs", ["mage", 1], 2, 0, 0, 400, "#2a3aa0", "shop"],
+    ["mystic_hat", "Mystic hat", "helm", ["mage", 40], 4, 0, 2, 15000, "#3a5ac8", "shop"],
+    ["mystic_robe_top", "Mystic robe top", "body", ["mage", 40], 20, 1, 8, 70000, "#3a5ac8", "shop"],
+    ["mystic_robe_bottom", "Mystic robe bottom", "legs", ["mage", 40], 15, 0, 5, 45000, "#3a5ac8", "shop"],
+    ["infinity_hat", "Infinity hat", "helm", ["mage", 50], 6, 1, 4, 300000, "#2a6ac8", "drop"],
+    ["infinity_top", "Infinity top", "body", ["mage", 50], 22, 1, 12, 400000, "#2a6ac8", "drop"],
+    ["infinity_bottoms", "Infinity bottoms", "legs", ["mage", 50], 17, 1, 9, 600000, "#2a6ac8", "drop"],
+    ["ahrims_hood", "Ahrim's hood", "helm", ["mage", 70], 6, 1, 15, 300000, "#3a3a4a", "drop"],
+    ["ahrims_robetop", "Ahrim's robetop", "body", ["mage", 70], 30, 2, 52, 1000000, "#3a3a4a", "drop"],
+    ["ahrims_robeskirt", "Ahrim's robeskirt", "legs", ["mage", 70], 22, 1, 33, 1200000, "#3a3a4a", "drop"],
+    ["ancestral_hat", "Ancestral hat", "helm", ["mage", 75], 8, 2, 12, 30000000, "#4a3a8a", "drop"],
+    ["ancestral_robe_top", "Ancestral robe top", "body", ["mage", 75], 35, 3, 30, 60000000, "#4a3a8a", "drop"],
+    ["ancestral_robe_bottom", "Ancestral robe bottom", "legs", ["mage", 75], 26, 2, 22, 40000000, "#4a3a8a", "drop"],
+  ];
+  const ITEMS = {
+    // Waffen
+    abyssal_whip: U({ name: "Abyssal whip", slot: "melee", atk: 70, str: 72, req: ["att", 70], value: 2500000, sprite: "w_whip", col: "#4a1a4a" }),
+    granite_maul: U({ name: "Granite maul", slot: "melee", atk: 58, str: 80, req: ["str", 50], value: 900000, sprite: "w_maul", col: "#6a6a6a" }),
+    dark_bow: U({ name: "Dark bow", slot: "range", atk: 78, rstr: 74, req: ["range", 60], value: 1800000, sprite: "w_darkbow", col: "#2a1a3a" }),
+    // Amulette
+    amulet_strength: U({ name: "Amulet of strength", slot: "neck", str: 10, value: 5000, shop: true, col: "#c84030" }),
+    amulet_power: U({ name: "Amulet of power", slot: "neck", atk: 6, str: 6, def: 6, value: 20000, shop: true, col: "#e0e0e0" }),
+    amulet_glory: U({ name: "Amulet of glory", slot: "neck", atk: 10, str: 6, rstr: 4, mdmg: 2, def: 3, value: 80000, shop: true, col: "#4a8ae0" }),
+    amulet_fury: U({ name: "Amulet of fury", slot: "neck", atk: 10, str: 8, rstr: 4, mdmg: 5, def: 15, value: 2200000, col: "#e8d080" }),
+    amulet_torture: U({ name: "Amulet of torture", slot: "neck", atk: 15, str: 10, value: 9000000, col: "#c83020" }),
+    necklace_anguish: U({ name: "Necklace of anguish", slot: "neck", atk: 15, rstr: 10, value: 8000000, col: "#5ac040" }),
+    occult_necklace: U({ name: "Occult necklace", slot: "neck", mdmg: 10, value: 700000, col: "#9a5aff" }),
+    // Ringe
+    warrior_ring: U({ name: "Warrior ring", slot: "ring", atk: 4, value: 40000, shop: true, col: "#c8c8c8" }),
+    berserker_ring: U({ name: "Berserker ring", slot: "ring", str: 4, value: 2500000, col: "#c83020" }),
+    archers_ring: U({ name: "Archers ring", slot: "ring", atk: 4, rstr: 2, value: 3000000, col: "#5ac040" }),
+    seers_ring: U({ name: "Seers ring", slot: "ring", mdmg: 4, value: 1500000, col: "#4a8ae0" }),
+    ultor_ring: U({ name: "Ultor ring", slot: "ring", str: 12, value: 40000000, col: "#e8a020" }),
+    // Umhaenge
+    obsidian_cape: U({ name: "Obsidian cape", slot: "cape", str: 2, def: 9, value: 60000, shop: true, col: "#3a1a1a" }),
+    avas_accumulator: U({ name: "Ava's accumulator", slot: "cape", atk: 4, rstr: 3, def: 4, value: 120000, shop: true, col: "#8a6234" }),
+    fire_cape: U({ name: "Fire cape", slot: "cape", str: 4, def: 11, value: 0, col: "#ff6a10" }),
+    infernal_cape: U({ name: "Infernal cape", slot: "cape", str: 8, rstr: 2, mdmg: 1, def: 12, value: 0, col: "#ff3a00" }),
+    // Stiefel
+    rune_boots: U({ name: "Rune boots", slot: "feet", str: 2, def: 12, value: 25000, shop: true, req: ["def", 40], col: "#4cb6cc" }),
+    ranger_boots: U({ name: "Ranger boots", slot: "feet", atk: 8, rstr: 2, def: 6, value: 30000000, col: "#2a6a2a" }),
+    dragon_boots: U({ name: "Dragon boots", slot: "feet", str: 4, def: 16, value: 250000, req: ["def", 60], col: "#c8402f" }),
+    primordial_boots: U({ name: "Primordial boots", slot: "feet", str: 5, def: 22, value: 30000000, req: ["def", 75], col: "#8a2a2a" }),
+    eternal_boots: U({ name: "Eternal boots", slot: "feet", mdmg: 2, def: 8, value: 4000000, req: ["def", 75], col: "#6aa0ff" }),
+    // Handschuhe
+    combat_bracelet: U({ name: "Combat bracelet", slot: "hands", atk: 7, str: 4, def: 5, value: 15000, shop: true, col: "#c8a040" }),
+    barrows_gloves: U({ name: "Barrows gloves", slot: "hands", atk: 12, str: 12, rstr: 12, mdmg: 2, def: 12, value: 130000, shop: true, req: ["def", 41], col: "#5a3a2a" }),
+    ferocious_gloves: U({ name: "Ferocious gloves", slot: "hands", atk: 16, str: 14, def: 4, value: 8000000, req: ["att", 80], col: "#3a2a2a" }),
+    // Materialien (werden automatisch in der Bank gestapelt)
+    nature_rune: { name: "Nature rune", mat: "rune", value: 180, col: "#3aa040" },
+    law_rune: { name: "Law rune", mat: "rune", value: 200, col: "#4a6ae0" },
+    death_rune: { name: "Death rune", mat: "rune", value: 220, col: "#e8e8e8" },
+    blood_rune: { name: "Blood rune", mat: "rune", value: 320, col: "#c82020" },
+    grimy_ranarr: { name: "Grimy ranarr weed", mat: "herb", value: 6500, col: "#3a8a3a" },
+    grimy_snapdragon: { name: "Grimy snapdragon", mat: "herb", value: 8000, col: "#5a9a2a" },
+    grimy_torstol: { name: "Grimy torstol", mat: "herb", value: 7500, col: "#2a6a1a" },
+    ranarr_seed: { name: "Ranarr seed", mat: "seed", value: 32000, col: "#8a6234" },
+    snapdragon_seed: { name: "Snapdragon seed", mat: "seed", value: 45000, col: "#7a5a2a" },
+    torstol_seed: { name: "Torstol seed", mat: "seed", value: 65000, col: "#6a4a1a" },
+    uncut_sapphire: { name: "Uncut sapphire", mat: "gem", value: 300, col: "#3a5ae0" },
+    uncut_emerald: { name: "Uncut emerald", mat: "gem", value: 650, col: "#3ac040" },
+    uncut_ruby: { name: "Uncut ruby", mat: "gem", value: 1300, col: "#e03030" },
+    uncut_diamond: { name: "Uncut diamond", mat: "gem", value: 3200, col: "#e8f0f8" },
+    uncut_dragonstone: { name: "Uncut dragonstone", mat: "gem", value: 13000, col: "#b040e0" },
+    coal: { name: "Coal", mat: "bar", value: 150, col: "#2a2a2a" },
+    adamantite_bar: { name: "Adamantite bar", mat: "bar", value: 2200, col: "#4f9461" },
+    rune_bar: { name: "Runite bar", mat: "bar", value: 12500, col: "#4cb6cc" },
+    draconic_visage: { name: "Draconic visage", mat: "rare", value: 3500000, col: "#3a3a3a" },
+    third_age_platebody: { name: "3rd age platebody", mat: "rare", value: 45000000, col: "#e8e8f0" },
+    gilded_platebody: { name: "Gilded platebody", mat: "rare", value: 2000000, col: "#e8c040" },
+    robin_hood_hat: { name: "Robin hood hat", mat: "rare", value: 3500000, col: "#3a7a2a" },
+    clue_hard: { name: "Clue scroll (hard)", clue: true, value: 0, col: "#e8dcb0" },
+  };
+  for (const [id, name, slot, req, a, d, def, value, col, src] of SETS) {
+    const range = req[0] === "range";
+    ITEMS[id] = U({ name, slot, req, value, col, shop: src === "shop", set: range ? "range" : "mage",
+      ratk: range ? a : 0, rstr: range ? d : 0, matk: range ? 0 : a, mdmg: range ? 0 : d, def });
+  }
+  const EXTRA_SLOTS = ["neck", "ring", "cape", "feet", "hands"];
+  // Gemeinsame Seltene-Drop-Tabelle (ab mittleren Gegnern)
+  const RARE_TABLE = [["uncut_sapphire", 1, 18], ["uncut_emerald", 1, 30], ["uncut_ruby", 1, 55], ["uncut_diamond", 1, 110], ["uncut_dragonstone", 1, 400], ["clue_hard", 1, 70], ["law_rune", 25, 25], ["nature_rune", 30, 20]];
+  function openClue() {
+    const out = [["coins", 20000 + Math.floor(Math.random() * 180000)]];
+    const roll = Math.random();
+    if (roll < .02) out.push(["third_age_platebody", 1]);
+    else if (roll < .07) out.push(["ranger_boots", 1]);
+    else if (roll < .14) out.push(["robin_hood_hat", 1]);
+    else if (roll < .24) out.push(["gilded_platebody", 1]);
+    else if (roll < .5) out.push(["amulet_glory", 1]);
+    out.push(["rune_bar", 1 + Math.floor(Math.random() * 4)]);
+    if (Math.random() < .5) out.push(["law_rune", 50 + Math.floor(Math.random() * 100)]);
+    return out;
+  }
+
   const itemId = (slot, t) => slot + ":" + t;
   const isGear = id => typeof id === "string" && id.includes(":");
   const parseItem = id => { const [s, t] = id.split(":"); return { slot: s, tier: +t }; };
@@ -482,11 +620,14 @@
   const bonesOf = id => BONES.find(b => b.id === id);
   const potionOf = id => POTIONS.find(p => p.id === id);
   function itemName(id) {
+    if (ITEMS[id]) return ITEMS[id].name;
+    if (id === "coins") return "Coins";
     if (isGear(id)) { const { slot, tier } = parseItem(id); return NAMES[slot][tier]; }
     const x = foodOf(id) || bonesOf(id) || potionOf(id); return x ? x.name : id;
   }
   function itemPrice(slot, t) { return Math.round(PRICE[t] * SLOT_PRICE[slot]); }
   function baseValue(id) {
+    if (ITEMS[id]) return ITEMS[id].value;
     if (isGear(id)) { const { slot, tier } = parseItem(id); return Math.round((PRICE[tier] || PRICE[6] * Math.pow(3, tier - 6)) * SLOT_PRICE[slot]); }
     const x = foodOf(id) || bonesOf(id) || potionOf(id); return x ? x.price : 0;
   }
@@ -494,6 +635,7 @@
   const highAlch = id => Math.round(baseValue(id) * .6);
   const ALCH_LEVEL = 55, NATURE_PRICE = 180, ALCH_XP = 65;
   function requirement(id) {
+    if (ITEMS[id]) return ITEMS[id].req ? { skill: ITEMS[id].req[0], level: ITEMS[id].req[1] } : null;
     if (!isGear(id)) return null;
     const { slot, tier } = parseItem(id);
     return { skill: SLOTS[slot].skill, level: TIER[tier].req };
@@ -504,17 +646,21 @@
   const MONSTERS = [
     M({ id: "chicken", name: "Chicken", place: "Lumbridge", lvl: 1, hp: 3, att: 1, def: 1, max: 1, gold: [1, 6], shape: "bird", col: "#ece6d3", ground: "grass", bones: "bones", drops: [["shrimps", 1, 4]] }),
     M({ id: "rat", name: "Giant rat", place: "Lumbridge Swamp", lvl: 4, hp: 7, att: 3, def: 3, max: 2, gold: [4, 14], shape: "rat", col: "#6f5a4a", ground: "swamp", bones: "bones", drops: [["shrimps", 2, 4], [itemId("helm", 1), 1, 30]] }),
-    M({ id: "goblin", name: "Goblin", place: "Goblin Village", lvl: 9, hp: 13, att: 7, def: 6, max: 3, gold: [10, 35], shape: "goblin", col: "#6aa04a", ground: "grass", bones: "bones", drops: [["trout", 1, 4], [itemId("melee", 1), 1, 40], [itemId("shield", 2), 1, 60]] }),
-    M({ id: "wolf", name: "White wolf", place: "White Wolf Mountain", lvl: 17, hp: 24, att: 15, def: 12, max: 5, gold: [25, 80], shape: "wolf", col: "#dfe3e8", ground: "snow", bones: "bones", drops: [["trout", 2, 3], [itemId("range", 2), 1, 45], [itemId("body", 2), 1, 70]] }),
-    M({ id: "hillgiant", name: "Hill Giant", place: "Edgeville Dungeon", lvl: 28, hp: 38, att: 25, def: 22, max: 8, gold: [60, 200], shape: "giant", col: "#c9a27a", ground: "cave", size: 1.35, bones: "big_bones", drops: [["lobster", 1, 4], [itemId("melee", 3), 1, 40], [itemId("legs", 3), 1, 55]] }),
-    M({ id: "troll", name: "Ice troll", place: "Jatizso", lvl: 45, hp: 50, att: 40, def: 38, max: 11, gold: [150, 500], shape: "troll", col: "#a9c4d2", ground: "snow", size: 1.3, bones: "big_bones", drops: [["lobster", 2, 3], ["prayer_potion", 1, 12], [itemId("body", 4), 1, 60], [itemId("mage", 4), 1, 50]] }),
-    M({ id: "firegiant", name: "Fire giant", place: "Brimhaven Dungeon", lvl: 62, hp: 65, att: 55, def: 52, max: 15, gold: [400, 1200], shape: "giant", col: "#d0602f", ground: "lava", size: 1.5, bones: "big_bones", drops: [["shark", 1, 4], ["prayer_potion", 1, 10], [itemId("melee", 5), 1, 60], [itemId("helm", 5), 1, 45]] }),
-    M({ id: "hellhound", name: "Hellhound", place: "Taverley Dungeon", lvl: 80, hp: 80, att: 72, def: 68, max: 19, gold: [900, 2600], shape: "hound", col: "#3a1f1c", ground: "lava", size: 1.2, bones: "bones", drops: [["shark", 2, 3], ["prayer_potion", 1, 8], [itemId("range", 5), 1, 50], [itemId("legs", 6), 1, 120]] }),
-    M({ id: "demon", name: "Greater demon", place: "Chaos Tunnels", lvl: 100, hp: 100, att: 88, def: 84, max: 23, gold: [2000, 5000], shape: "demon", col: "#9b2020", ground: "lava", size: 1.5, bones: "big_bones", styles: [["melee", 3], ["mage", 1]], drops: [["shark", 2, 2], ["prayer_potion", 1, 6], [itemId("mage", 6), 1, 80], [itemId("shield", 6), 1, 70]] }),
-    M({ id: "dragon", name: "Black dragon", place: "Taverley Dungeon", lvl: 125, hp: 130, att: 118, def: 102, max: 30, gold: [4000, 9000], shape: "dragon", col: "#2d2d33", ground: "cave", size: 1.6, bones: "dragon_bones", styles: [["melee", 2], ["mage", 1]], drops: [["manta", 1, 3], ["prayer_potion", 1, 5], [itemId("body", 6), 1, 45], [itemId("melee", 6), 1, 40], [itemId("helm", 6), 1, 35], [itemId("range", 6), 1, 50]] }),
-    M({ id: "dharok", name: "Dharok the Wretched", place: "Barrows", lvl: 150, hp: 170, att: 142, def: 132, max: 38, gold: [7000, 15000], shape: "dharok", col: "#5f5a50", ground: "crypt", size: 1.15, boss: true, bones: "big_bones", drops: [["manta", 2, 2], ["prayer_potion", 2, 3], ...SLOT_KEYS.map(s => [itemId(s, 7), 1, 22])] }),
-    M({ id: "graardor", name: "General Graardor", place: "God Wars Dungeon", lvl: 185, hp: 210, att: 168, def: 152, max: 44, gold: [12000, 26000], shape: "ogre", col: "#7a6a4a", ground: "dirt", size: 1.8, boss: true, bones: "big_bones", styles: [["melee", 3], ["range", 1]], drops: [["manta", 2, 2], ["prayer_potion", 2, 3], ...SLOT_KEYS.map(s => [itemId(s, 8), 1, 26])] }),
-    M({ id: "nex", name: "Nex", place: "Ancient Prison", lvl: 240, hp: 280, att: 196, def: 178, max: 52, gold: [25000, 60000], shape: "nex", col: "#4a3a6a", ground: "void", size: 1.5, boss: true, bones: "dragon_bones", styles: [["melee", 1], ["range", 1], ["mage", 1]], drops: [["manta", 3, 2], ["prayer_potion", 2, 2], ...SLOT_KEYS.map(s => [itemId(s, 9), 1, 30])] }),
+    M({ id: "goblin", name: "Goblin", place: "Goblin Village", lvl: 9, hp: 13, att: 7, def: 6, max: 3, gold: [10, 35], shape: "goblin", col: "#6aa04a", ground: "grass", bones: "bones", drops: [["trout", 1, 4], [itemId("melee", 1), 1, 40], [itemId("shield", 2), 1, 60], ["nature_rune", 4, 8], ["coal", 1, 10]] }),
+    M({ id: "wolf", name: "White wolf", place: "White Wolf Mountain", lvl: 17, hp: 24, att: 15, def: 12, max: 5, gold: [25, 80], shape: "wolf", col: "#dfe3e8", ground: "snow", bones: "bones", drops: [["trout", 2, 3], [itemId("range", 2), 1, 45], [itemId("body", 2), 1, 70], ["law_rune", 3, 10], ["uncut_sapphire", 1, 20]] }),
+    M({ id: "hillgiant", name: "Hill Giant", place: "Edgeville Dungeon", lvl: 28, hp: 38, att: 25, def: 22, max: 8, gold: [60, 200], shape: "giant", col: "#c9a27a", ground: "cave", size: 1.35, bones: "big_bones", drops: [["lobster", 1, 4], [itemId("melee", 3), 1, 40], [itemId("legs", 3), 1, 55], ["law_rune", 6, 6], ["grimy_ranarr", 1, 35], ["adamantite_bar", 1, 25], ["obsidian_cape", 1, 160]] }),
+    M({ id: "troll", name: "Ice troll", place: "Jatizso", lvl: 45, hp: 50, att: 40, def: 38, max: 11, gold: [150, 500], shape: "troll", col: "#a9c4d2", ground: "snow", size: 1.3, bones: "big_bones", drops: [["lobster", 2, 3], ["prayer_potion", 1, 12], [itemId("body", 4), 1, 60], [itemId("mage", 4), 1, 50], ["nature_rune", 12, 6], ["grimy_ranarr", 1, 20], ["warrior_ring", 1, 120]] }),
+    M({ id: "firegiant", name: "Fire giant", place: "Brimhaven Dungeon", lvl: 62, hp: 65, att: 55, def: 52, max: 15, gold: [400, 1200], shape: "giant", col: "#d0602f", ground: "lava", size: 1.5, bones: "big_bones", drops: [["shark", 1, 4], ["prayer_potion", 1, 10], [itemId("melee", 5), 1, 60], [itemId("helm", 5), 1, 45], ["fire_cape", 1, 220], ["blood_rune", 8, 8], ["rune_bar", 1, 20], ["amulet_power", 1, 90]] }),
+    M({ id: "hellhound", name: "Hellhound", place: "Taverley Dungeon", lvl: 80, hp: 80, att: 72, def: 68, max: 19, gold: [900, 2600], shape: "hound", col: "#3a1f1c", ground: "lava", size: 1.2, bones: "bones", drops: [["shark", 2, 3], ["prayer_potion", 1, 8], [itemId("range", 5), 1, 50], [itemId("legs", 6), 1, 120], ["death_rune", 15, 6], ["grimy_snapdragon", 1, 22], ["primordial_boots", 1, 800]] }),
+    M({ id: "demon", name: "Greater demon", place: "Chaos Tunnels", lvl: 100, hp: 100, att: 88, def: 84, max: 23, gold: [2000, 5000], shape: "demon", col: "#9b2020", ground: "lava", size: 1.5, bones: "big_bones", styles: [["melee", 3], ["mage", 1]], drops: [["shark", 2, 2], ["prayer_potion", 1, 6], [itemId("mage", 6), 1, 80], [itemId("shield", 6), 1, 70], ["blood_rune", 12, 5], ["rune_bar", 1, 12], ["seers_ring", 1, 260], ["infinity_hat", 1, 120], ["infinity_bottoms", 1, 160]] }),
+    M({ id: "gargoyle", name: "Gargoyle", place: "Slayer Tower", lvl: 111, hp: 105, att: 92, def: 110, max: 22, gold: [2500, 6000], shape: "gargoyle", col: "#6a6a64", ground: "crypt", size: 1.45, bones: "big_bones", drops: [["shark", 1, 3], ["granite_maul", 1, 80], ["rune_bar", 2, 8], ["adamantite_bar", 4, 6], ["berserker_ring", 1, 220], ["dragon_boots", 1, 140]] }),
+    M({ id: "abyssal", name: "Abyssal demon", place: "Slayer Tower", lvl: 124, hp: 150, att: 105, def: 95, max: 26, gold: [3000, 8000], shape: "abyssal", col: "#5a1a5a", ground: "crypt", size: 1.45, bones: "big_bones", drops: [["shark", 1, 3], ["abyssal_whip", 1, 90], ["blood_rune", 15, 5], ["death_rune", 20, 5], ["grimy_ranarr", 1, 8], ["occult_necklace", 1, 260], ["ranarr_seed", 1, 25], ["infinity_top", 1, 140]] }),
+    M({ id: "dragon", name: "Black dragon", place: "Taverley Dungeon", lvl: 125, hp: 130, att: 118, def: 102, max: 30, gold: [4000, 9000], shape: "dragon", col: "#2d2d33", ground: "cave", size: 1.6, bones: "dragon_bones", styles: [["melee", 2], ["mage", 1]], drops: [["manta", 1, 3], ["prayer_potion", 1, 5], [itemId("body", 6), 1, 45], [itemId("melee", 6), 1, 40], [itemId("helm", 6), 1, 35], [itemId("range", 6), 1, 50], ["rune_bar", 2, 6], ["draconic_visage", 1, 400], ["archers_ring", 1, 320]] }),
+    M({ id: "dharok", name: "Dharok the Wretched", place: "Barrows", lvl: 150, hp: 170, att: 142, def: 132, max: 38, gold: [7000, 15000], shape: "dharok", col: "#5f5a50", ground: "crypt", size: 1.15, boss: true, bones: "big_bones", drops: [["manta", 2, 2], ["prayer_potion", 2, 3], ...SLOT_KEYS.map(s => [itemId(s, 7), 1, 22]), ["amulet_fury", 1, 160], ["grimy_torstol", 2, 6], ["torstol_seed", 1, 25], ["karils_coif", 1, 40], ["karils_top", 1, 45], ["karils_skirt", 1, 45], ["ahrims_hood", 1, 40], ["ahrims_robetop", 1, 45], ["ahrims_robeskirt", 1, 45]] }),
+    M({ id: "darkbeast", name: "Dark beast", place: "Kourend Catacombs", lvl: 182, hp: 220, att: 150, def: 140, max: 40, gold: [9000, 20000], shape: "darkbeast", col: "#2a2a2a", ground: "swamp", size: 1.55, bones: "big_bones", drops: [["manta", 1, 3], ["dark_bow", 1, 70], ["death_rune", 40, 4], ["grimy_snapdragon", 1, 8], ["snapdragon_seed", 1, 30], ["necklace_anguish", 1, 300], ["eternal_boots", 1, 320], ["armadyl_helmet", 1, 120], ["armadyl_chainskirt", 1, 160]] }),
+    M({ id: "graardor", name: "General Graardor", place: "God Wars Dungeon", lvl: 185, hp: 210, att: 168, def: 152, max: 44, gold: [12000, 26000], shape: "ogre", col: "#7a6a4a", ground: "dirt", size: 1.8, boss: true, bones: "big_bones", styles: [["melee", 3], ["range", 1]], drops: [["manta", 2, 2], ["prayer_potion", 2, 3], ...SLOT_KEYS.map(s => [itemId(s, 8), 1, 26]), ["primordial_boots", 1, 110], ["amulet_torture", 1, 140], ["ultor_ring", 1, 260], ["ferocious_gloves", 1, 200], ["armadyl_chestplate", 1, 160]] }),
+    M({ id: "kbd", name: "King Black Dragon", place: "KBD Lair", lvl: 210, hp: 255, att: 178, def: 160, max: 48, gold: [15000, 35000], shape: "kbd", col: "#1a1a1e", ground: "lava", size: 2, boss: true, bones: "dragon_bones", styles: [["melee", 2], ["mage", 2]], drops: [["manta", 2, 2], ["draconic_visage", 1, 60], ["amulet_fury", 1, 90], ["rune_bar", 5, 3], ...SLOT_KEYS.filter(k => k !== "shield").map(k => [itemId(k, 6), 1, 14]), ["ancestral_hat", 1, 110]] }),
+    M({ id: "nex", name: "Nex", place: "Ancient Prison", lvl: 240, hp: 280, att: 196, def: 178, max: 52, gold: [25000, 60000], shape: "nex", col: "#4a3a6a", ground: "void", size: 1.5, boss: true, bones: "dragon_bones", styles: [["melee", 1], ["range", 1], ["mage", 1]], drops: [["manta", 3, 2], ["prayer_potion", 2, 2], ...SLOT_KEYS.map(s => [itemId(s, 9), 1, 30]), ["infernal_cape", 1, 120], ["torstol_seed", 2, 10], ["necklace_anguish", 1, 120], ["ultor_ring", 1, 150], ["masori_mask", 1, 60], ["masori_body", 1, 80], ["masori_chaps", 1, 70], ["ancestral_robe_top", 1, 80], ["ancestral_robe_bottom", 1, 70]] }),
   ];
   function pickStyle(m) {
     const total = m.styles.reduce((a, s) => a + s[1], 0);
@@ -529,38 +675,50 @@
   }
   function armourBonus(eq) {
     let def = 0;
-    for (const s of ARMOUR_SLOTS) if (eq[s] != null) def += Math.round(ARM[eq[s]] * SLOTS[s].mult);
-    return def;
+    for (const s of ARMOUR_SLOTS) if (typeof eq[s] === "number") def += Math.round(ARM[eq[s]] * SLOTS[s].mult);
+    return def + extraBonus(eq).def;
   }
-  function weaponOf(eq) { return eq.weapon ? parseItem(eq.weapon) : { slot: "melee", tier: -1 }; }
+  // Waffe: Stufen-Waffe ("melee:3") oder einzigartige Waffe ("abyssal_whip")
+  function weaponOf(eq) {
+    if (!eq.weapon) return { slot: "melee", tier: -1, atk: 0, str: 0, spell: 2 };
+    const u = ITEMS[eq.weapon];
+    if (u) return { slot: u.slot, tier: 6, atk: u.atk, str: u.slot === "range" ? u.rstr : u.str, spell: SPELL[6], unique: true };
+    const w = parseItem(eq.weapon);
+    return { slot: w.slot, tier: w.tier, atk: W_ATK[w.tier], str: W_STR[w.tier], spell: SPELL[w.tier] };
+  }
+  // Summe der Boni aus Amulett, Ring, Umhang, Stiefeln, Handschuhen
+  function extraBonus(eq) {
+    const b = { atk: 0, ratk: 0, matk: 0, str: 0, rstr: 0, mdmg: 0, def: 0 };
+    for (const k of EXTRA_SLOTS.concat(ARMOUR_SLOTS)) { const u = typeof eq[k] === "string" && ITEMS[eq[k]]; if (u) for (const x in b) b[x] += u[x] || 0; }
+    return b;
+  }
   function stylesFor(eq) {
     const w = weaponOf(eq).slot;
-    if (w === "range") return [{ id: "range", name: "Genau", xp: "Fernkampf" }];
-    if (w === "mage") return [{ id: "mage", name: "Zaubern", xp: "Magie" }];
+    if (w === "range") return [{ id: "range", name: "Genau", xp: "Fernkampf" }, { id: "rdef", name: "Weitschuss", xp: "Fernk. + Vert." }];
+    if (w === "mage") return [{ id: "mage", name: "Zaubern", xp: "Magie" }, { id: "mdef", name: "Defensiv zaubern", xp: "Magie + Vert." }];
     return [{ id: "acc", name: "Genau", xp: "Angriff" }, { id: "aggr", name: "Aggressiv", xp: "Stärke" }, { id: "defn", name: "Defensiv", xp: "Verteidigung" }];
   }
   // boosts: Ergebnis von prayerBoosts()
   function playerAttack(lv, eq, style, m, boosts) {
     const B = boosts || prayerBoosts([]);
-    const w = weaponOf(eq), t = w.tier;
+    const w = weaponOf(eq), X = extraBonus(eq);
     const mDefRoll = (m.def + 9) * (m.defBonus + 64);
     if (w.slot === "range") {
       const eff = Math.floor(lv.range * (1 + B.range)) + 8;
-      return { chance: hitChance(eff * (W_ATK[t] + 64), mDefRoll), max: Math.max(1, Math.floor(.5 + eff * (W_STR[t] + 64) / 640)) };
+      return { chance: hitChance(eff * (w.atk + X.atk + X.ratk + 64), mDefRoll), max: Math.max(1, Math.floor(.5 + eff * (w.str + X.rstr + 64) / 640)) };
     }
     if (w.slot === "mage") {
       const eff = Math.floor(lv.mage * (1 + B.mage)) + 8;
-      return { chance: hitChance(eff * (W_ATK[t] + 64), mDefRoll), max: Math.floor(SPELL[t] * (1 + lv.mage / 200 + B.mage * .3)) };
+      return { chance: hitChance(eff * (w.atk + X.atk + X.matk + 64), mDefRoll), max: Math.floor(w.spell * (1 + lv.mage / 200 + B.mage * .3 + X.mdmg / 100)) };
     }
-    const atk = t >= 0 ? W_ATK[t] : 0, str = t >= 0 ? W_STR[t] : 0;
     const eff = Math.floor(lv.att * (1 + B.att)) + 8 + (style === "acc" ? 3 : 0);
     const effStr = Math.floor(lv.str * (1 + B.str)) + 8 + (style === "aggr" ? 3 : 0);
-    return { chance: hitChance(eff * (atk + 64), mDefRoll), max: Math.max(1, Math.floor(.5 + effStr * (str + 64) / 640)) };
+    return { chance: hitChance(eff * (w.atk + X.atk + 64), mDefRoll), max: Math.max(1, Math.floor(.5 + effStr * (w.str + X.str + 64) / 640)) };
   }
   // mstyle: Angriffsart des Monsters. Schutzgebet blockt bei normalen Monstern alles, bei Bossen 60 %.
   function monsterAttack(lv, eq, m, style, mstyle, boosts) {
     const B = boosts || prayerBoosts([]);
-    const defLv = Math.floor(lv.def * (1 + B.def)) + 9 + (style === "defn" ? 3 : 0);
+    const defLv = Math.floor(lv.def * (1 + B.def)) + 9 + (style === "defn" || style === "rdef" || style === "mdef" ? 3 : 0);
     const defRoll = mstyle === "mage" ? (Math.floor(lv.mage * .7 + lv.def * .3) + 9) * (Math.floor(armourBonus(eq) * .5) + 64) : defLv * (armourBonus(eq) + 64);
     const protectedHit = B.protect === mstyle;
     return { chance: hitChance((m.att + 9) * 64, defRoll), max: m.max, mult: protectedHit ? (m.boss ? .4 : 0) : 1 };
@@ -571,6 +729,8 @@
     if (style === "aggr") return { str: x, hp };
     if (style === "defn") return { def: x, hp };
     if (style === "range") return { range: x, hp };
+    if (style === "rdef") return { range: x / 2, def: x / 2, hp };
+    if (style === "mdef") return { mage: Math.round(x / 3), def: Math.round(x / 4), hp };
     return { mage: x, hp };
   }
   function combatLevel(lv) {
@@ -591,7 +751,7 @@
     return "#ff0000";
   }
 
-  root.Grind = { XP_RATE, TICK_MS, XP_TABLE, levelFor, SKILLS, SKILL_NAME, TIER, NAMES, SLOTS, SLOT_KEYS, ARMOUR_SLOTS, FOOD, BONES, POTIONS, PRAYERS,
+  root.Grind = { SETS, ITEMS, EXTRA_SLOTS, RARE_TABLE, openClue, extraBonus, XP_RATE, TICK_MS, XP_TABLE, levelFor, SKILLS, SKILL_NAME, TIER, NAMES, SLOTS, SLOT_KEYS, ARMOUR_SLOTS, FOOD, BONES, POTIONS, PRAYERS,
     prayerConflicts, prayerBoosts, MONSTERS, pickStyle, W_ATK, W_STR, SPELL, ARM, itemId, isGear, parseItem, foodOf, bonesOf, potionOf, itemName, itemPrice,
     baseValue, sellPrice, highAlch, ALCH_LEVEL, NATURE_PRICE, ALCH_XP, requirement, hitChance, playerAttack, monsterAttack, armourBonus, weaponOf, stylesFor,
     xpFor, combatLevel, levelColour };
@@ -601,7 +761,7 @@
 <script>
 (() => {
   "use strict";
-  const VERSION = 2;
+  const VERSION = 3;
   const G = window.Grind;
   const $ = id => document.getElementById(id);
   const rnd = n => Math.floor(Math.random() * n);
@@ -627,7 +787,8 @@
     const s = Object.assign(freshSave(), o || {});
     s.xp = Object.assign({ att: 0, str: 0, def: 0, range: 0, mage: 0, pray: 0, hp: G.XP_TABLE[10] }, s.xp || {});
     s.prayers = Array.isArray(s.prayers) ? s.prayers : []; s.pp = s.pp == null ? 1 : s.pp;
-    s.eq = Object.assign({ weapon: null, helm: null, body: null, legs: null, shield: null }, s.eq || {});
+    s.eq = Object.assign({ weapon: null, helm: null, body: null, legs: null, shield: null, neck: null, ring: null, cape: null, feet: null, hands: null }, s.eq || {});
+    s.loot = s.loot && typeof s.loot === "object" ? s.loot : {};
     s.inv = (Array.isArray(s.inv) ? s.inv : []).concat(new Array(INV_SIZE).fill(null)).slice(0, INV_SIZE);
     s.bank = s.bank && typeof s.bank === "object" ? s.bank : {};
     s.kills = s.kills || {};
@@ -751,12 +912,18 @@
   let fighting = false, tickAcc = 0, regenTimer = 0, deathTimer = 0;
 
   function playerLayers() {
-    const e = S.eq, L = ["p_body"];
-    L.push(e.legs != null ? "p_legs" + e.legs : "p_pants");
-    L.push(e.body != null ? "p_body" + e.body : "p_shirt");
-    L.push(e.helm != null ? "p_helm" + e.helm : "p_hair");
-    if (e.shield != null && G.weaponOf(e).slot !== "range") L.push("p_shield" + e.shield);
-    if (e.weapon) { const w = G.parseItem(e.weapon); L.push("w_" + w.slot + w.tier); }
+    const e = S.eq, L = [];
+    const lay = (slot, v, fallback) => v == null ? fallback : typeof v === "string" ? "p_" + v : "p_" + slot + v;
+    if (e.cape) L.push("p_capeB_" + e.cape);
+    L.push("p_body");
+    if (e.feet) L.push("p_" + e.feet);
+    L.push(lay("legs", e.legs, "p_pants"));
+    L.push(lay("body", e.body, "p_shirt"));
+    if (e.hands) L.push("p_" + e.hands);
+    if (e.cape) L.push("p_capeF_" + e.cape);
+    L.push(lay("helm", e.helm, "p_hair"));
+    if (e.shield != null && G.weaponOf(e).slot !== "range") L.push(lay("shield", e.shield, null));
+    if (e.weapon) { const u = G.ITEMS[e.weapon]; if (u) L.push(u.sprite); else { const w = G.parseItem(e.weapon); L.push("w_" + w.slot + w.tier); } }
     L.forEach(img);
     return L;
   }
@@ -1052,6 +1219,13 @@
     return best;
   }
 
+  // Wertfarben wie beim Ground-Items-Plugin
+  function valueColour(v) { return v >= 10e6 ? "#ff66ff" : v >= 1e6 ? "#ff9a1a" : v >= 100e3 ? "#5aff5a" : v >= 10e3 ? "#66b2ff" : "#ffffff"; }
+  function addLoot(id, qty) {
+    const it = G.ITEMS[id];
+    if (it && it.mat) bankAdd(id, qty);                   // Materialien stapeln in der Bank
+    else for (let k = 0; k < qty; k++) if (!invAdd(id)) bankAdd(id);
+  }
   function monsterDies() {
     F.dead = true; F.deadT = 0; F.respawn = 4;
     animate(F, "death");
@@ -1059,21 +1233,53 @@
     const m = F.data;
     const gold = m.gold[0] + rnd(m.gold[1] - m.gold[0] + 1);
     S.coins += gold;
-    let rare = false;
-    const got = [`<span class="gold">${fmt(gold)} Münzen</span>`];
-    if (m.bones) { if (!invAdd(m.bones)) bankAdd(m.bones); got.push(esc(G.itemName(m.bones))); }
-    for (const [id, qty, rate] of m.drops) {
+    const drops = [["coins", gold]];
+    if (m.bones) drops.push([m.bones, 1]);
+    const table = m.drops.concat(m.lvl >= 17 ? G.RARE_TABLE : []);
+    for (const [id, qty, rate] of table) {
       if (Math.random() >= 1 / rate) continue;
-      for (let i = 0; i < qty; i++) {
-        if (!invAdd(id)) bankAdd(id);
-      }
-      if (G.isGear(id)) { rare = true; chat(`Wertvoller Drop: ${esc(G.itemName(id))}${S.inv.includes(id) ? "" : " (in die Bank)"}`, "drop"); }
-      else got.push(esc(G.itemName(id)) + (qty > 1 ? " ×" + qty : ""));
+      const n = G.ITEMS[id] && G.ITEMS[id].mat ? Math.max(1, Math.round(qty * (.6 + Math.random() * .8))) : qty;
+      drops.push([id, n]);
     }
-    if (rare) lootBeam2d(F.x);
+    // Loot-Tracker
+    const T = S.loot[m.id] || (S.loot[m.id] = { kills: 0, gp: 0, items: {} });
+    T.kills++;
+    let best = 0;
+    for (const [id, n] of drops) {
+      if (id !== "coins" && id !== m.bones) addLoot(id, n);
+      const v = id === "coins" ? n : G.baseValue(id) * n;
+      T.gp += v; if (id !== "coins") T.items[id] = (T.items[id] || 0) + n;
+      if (id !== "coins") best = Math.max(best, v);
+      if (id !== "coins" && v >= 100e3) chat(`Wertvoller Drop: ${esc(G.itemName(id))}${n > 1 ? " ×" + n : ""} (${fmt(v)} gp)`, "drop");
+    }
+    showGroundLoot(drops);
+    if (best >= 100e3) lootBeam2d(F.x);
     burst2d(F.x, GROUND - 4, "#ffd700", 8);
-    chat("Loot: " + got.join(", "));
-    renderInv(); renderBank(); renderCoins(); renderPlaces(); persist();
+    chat("Loot: " + drops.filter(d => G.baseValue(d[0]) * d[1] < 100e3 || d[0] === "coins").map(([id, n]) => `<span style="color:${valueColour(id === "coins" ? n : G.baseValue(id) * n)}">${esc(id === "coins" ? fmt(n) + " Münzen" : G.itemName(id) + (n > 1 ? " ×" + n : ""))}</span>`).join(", "));
+    renderInv(); renderBank(); renderCoins(); renderPlaces(); renderLoot(); persist();
+  }
+  // Items fallen sichtbar auf den Boden, mit Namen in Wertfarbe
+  function showGroundLoot(drops) {
+    const shown = drops.slice(0, 6);
+    shown.forEach(([id, n], k) => {
+      const x0 = F.x + (k - (shown.length - 1) / 2) * 12, t0 = performance.now() + k * 90;
+      const im = new Image(); im.src = id === "coins" ? icon("coins") : icon(id);
+      const v = id === "coins" ? n : G.baseValue(id) * n;
+      const label = document.createElement("div"); label.className = "grounditem";
+      label.style.color = valueColour(v);
+      label.textContent = (id === "coins" ? fmt(n) + " Coins" : G.itemName(id) + (n > 1 ? " (" + n + ")" : ""));
+      label.hidden = true; overlay.appendChild(label);
+      fxList.push(now => {
+        const t = (now - t0) / 1000; if (t < 0) return true;
+        if (t > 2.6) { label.remove(); return false; }
+        const y = GROUND + 6 - Math.max(0, Math.sin(Math.min(1, t * 2.2) * Math.PI) * 18) - k % 2 * 6;
+        g.globalAlpha = t > 2.2 ? (2.6 - t) / .4 : 1;
+        if (im.complete) g.drawImage(im, Math.round(x0 - 7), Math.round(y - 14), 14, 14);
+        g.globalAlpha = 1;
+        if (t > .45) { const sp = toScreen(F.x, GROUND - 22 - k * 9); label.hidden = false; label.style.left = sp.x + "px"; label.style.top = sp.y + "px"; label.style.opacity = t > 2.2 ? (2.6 - t) / .4 : 1; }
+        return true;
+      });
+    });
   }
   function playerDies() {
     P.dead = true; P.deadT = 0; fighting = false; deathTimer = 5; S.prayers = [];
@@ -1133,6 +1339,7 @@
   const iconCache = new Map();
   function icon(id) {
     if (iconCache.has(id)) return iconCache.get(id);
+    if (G.ITEMS[id]) { const url = uniqueIcon(id); iconCache.set(id, url); return url; }
     const c = document.createElement("canvas"); c.width = c.height = 36;
     const g = c.getContext("2d");
     const out = (fn, fill) => { g.save(); g.translate(1, 1); g.fillStyle = "#000"; fn(); g.restore(); g.fillStyle = fill; fn(); };
@@ -1187,6 +1394,39 @@
     const url = c.toDataURL();
     iconCache.set(id, url);
     return url;
+  }
+  function uniqueIcon(id) {
+    const u = G.ITEMS[id], c = document.createElement("canvas"); c.width = c.height = 36;
+    const g = c.getContext("2d"); g.lineJoin = "round"; g.lineCap = "round";
+    const col = u.col || "#c8c8c8";
+    const fill = (fn, f) => { g.save(); g.translate(1, 1); g.fillStyle = "#000"; fn(); g.restore(); g.fillStyle = f; fn(); };
+    const line = (fn, f, w) => { g.save(); g.translate(1, 1); g.strokeStyle = "#000"; g.lineWidth = w + 2; fn(); g.stroke(); g.restore(); g.strokeStyle = f; g.lineWidth = w; fn(); g.stroke(); };
+    const slot = u.slot, mat = u.mat;
+    if (u.clue) { fill(() => g.fillRect(6, 9, 24, 18), "#e8dcb0"); g.fillStyle = "#8a6234"; g.fillRect(6, 7, 3, 22); g.fillRect(27, 7, 3, 22); g.fillStyle = "#5a4a3a"; for (let k = 0; k < 4; k++) g.fillRect(11, 12 + k * 4, 14, 1); }
+    else if (mat === "rune") { fill(() => { g.beginPath(); g.arc(18, 18, 11, 0, 7); g.fill(); }, "#8a8a8a"); g.fillStyle = col; g.beginPath(); g.arc(18, 18, 6, 0, 7); g.fill(); }
+    else if (mat === "herb") { fill(() => { g.beginPath(); g.ellipse(14, 18, 6, 12, -.6, 0, 7); g.fill(); g.beginPath(); g.ellipse(22, 18, 6, 12, .6, 0, 7); g.fill(); }, col); g.strokeStyle = "#1a3a10"; g.beginPath(); g.moveTo(18, 30); g.lineTo(18, 8); g.stroke(); }
+    else if (mat === "seed") { for (const [x, y] of [[13, 15], [21, 13], [17, 22], [24, 21]]) fill(() => { g.beginPath(); g.ellipse(x, y, 4, 3, .4, 0, 7); g.fill(); }, col); }
+    else if (mat === "gem") { fill(() => { g.beginPath(); g.moveTo(18, 6); g.lineTo(29, 15); g.lineTo(18, 30); g.lineTo(7, 15); g.closePath(); g.fill(); }, col); g.fillStyle = "rgba(255,255,255,.5)"; g.beginPath(); g.moveTo(18, 8); g.lineTo(24, 15); g.lineTo(18, 15); g.fill(); }
+    else if (mat === "bar") { fill(() => { g.beginPath(); g.moveTo(6, 24); g.lineTo(12, 14); g.lineTo(30, 14); g.lineTo(24, 24); g.closePath(); g.fill(); }, col); }
+    else if (mat === "rare") {
+      if (/platebody/.test(id)) { fill(() => { g.beginPath(); g.moveTo(5, 10); g.lineTo(12, 5); g.lineTo(24, 5); g.lineTo(31, 10); g.lineTo(30, 20); g.lineTo(26, 18); g.lineTo(26, 31); g.lineTo(10, 31); g.lineTo(10, 18); g.lineTo(6, 20); g.closePath(); g.fill(); }, col); g.fillStyle = id.startsWith("third") ? "#e8c040" : "#c8a020"; g.fillRect(16, 6, 4, 25); }
+      else if (/hat/.test(id)) { fill(() => { g.beginPath(); g.moveTo(5, 26); g.quadraticCurveTo(18, 2, 31, 26); g.closePath(); g.fill(); }, col); g.fillStyle = "#c82020"; g.fillRect(24, 6, 3, 14); }
+      else { fill(() => { g.beginPath(); g.moveTo(8, 8); g.lineTo(28, 8); g.lineTo(26, 28); g.lineTo(18, 32); g.lineTo(10, 28); g.closePath(); g.fill(); }, col); g.fillStyle = "#ff4010"; g.fillRect(14, 16, 3, 3); g.fillRect(20, 16, 3, 3); }
+    }
+    else if (slot === "neck") { line(() => { g.beginPath(); g.arc(18, 12, 10, .2, Math.PI - .2); }, "#e8c040", 2); fill(() => { g.beginPath(); g.arc(18, 25, 6, 0, 7); g.fill(); }, col); }
+    else if (slot === "ring") { line(() => { g.beginPath(); g.arc(18, 20, 8, 0, 7); }, "#e8c040", 3); fill(() => { g.beginPath(); g.arc(18, 11, 4, 0, 7); g.fill(); }, col); }
+    else if (slot === "cape") { fill(() => { g.beginPath(); g.moveTo(10, 4); g.lineTo(26, 4); g.lineTo(31, 32); g.lineTo(5, 32); g.closePath(); g.fill(); }, col); g.fillStyle = "rgba(0,0,0,.25)"; g.fillRect(17, 5, 2, 26); }
+    else if (slot === "feet") { fill(() => { g.fillRect(6, 10, 9, 16); g.fillRect(6, 22, 13, 6); g.fillRect(19, 10, 9, 16); g.fillRect(19, 22, 13, 6); }, col); }
+    else if (slot === "hands") { fill(() => { g.fillRect(6, 10, 10, 16); g.fillRect(4, 14, 3, 7); g.fillRect(20, 10, 10, 16); g.fillRect(29, 14, 3, 7); }, col); }
+    else if (slot === "melee") {
+      if (id === "abyssal_whip") { line(() => { g.beginPath(); g.moveTo(8, 28); g.bezierCurveTo(30, 26, 4, 14, 26, 6); }, col, 3); g.fillStyle = "#2a2a2a"; g.fillRect(5, 26, 6, 6); }
+      else { line(() => { g.beginPath(); g.moveTo(8, 30); g.lineTo(24, 10); }, "#6b4a26", 3); fill(() => g.fillRect(18, 3, 14, 12), col); }
+    }
+    else if (slot === "range") { line(() => { g.beginPath(); g.moveTo(8, 4); g.quadraticCurveTo(34, 18, 8, 32); }, col, 3); g.strokeStyle = "#e8e0c8"; g.lineWidth = 1; g.beginPath(); g.moveTo(8, 4); g.lineTo(8, 32); g.stroke(); }
+    else if (slot === "helm") { fill(() => { g.beginPath(); g.moveTo(7, 30); g.lineTo(7, 14); g.quadraticCurveTo(18, 0, 29, 14); g.lineTo(29, 30); g.closePath(); g.fill(); }, col); if (u.set === "mage") { g.fillStyle = col; g.beginPath(); g.moveTo(10, 14); g.lineTo(18, 0); g.lineTo(26, 14); g.fill(); } else { g.fillStyle = "#111"; g.fillRect(10, 17, 16, 3); } }
+    else if (slot === "body") { fill(() => { g.beginPath(); g.moveTo(5, 10); g.lineTo(12, 5); g.lineTo(24, 5); g.lineTo(31, 10); g.lineTo(30, 20); g.lineTo(26, 18); g.lineTo(26, u.set === "mage" ? 33 : 31); g.lineTo(10, u.set === "mage" ? 33 : 31); g.lineTo(10, 18); g.lineTo(6, 20); g.closePath(); g.fill(); }, col); g.fillStyle = "rgba(0,0,0,.25)"; g.fillRect(17, 6, 2, 25); }
+    else if (slot === "legs") { fill(() => { g.beginPath(); g.moveTo(9, 5); g.lineTo(27, 5); g.lineTo(28, 31); g.lineTo(20, 31); g.lineTo(18, 14); g.lineTo(16, 31); g.lineTo(8, 31); g.closePath(); g.fill(); }, col); }
+    return c.toDataURL();
   }
   function monsterIcon(m) {
     const key = "mon:" + m.id;
@@ -1321,15 +1561,19 @@
     const id = S.inv[i];
     const r = G.requirement(id);
     if (!meetsReq(id)) { chat(`Du brauchst Stufe ${r.level} ${G.SKILL_NAME[r.skill]}, um das zu tragen.`, "red"); return; }
-    const { slot } = G.parseItem(id);
+    const u = G.ITEMS[id];
+    const slot = u ? u.slot : G.parseItem(id).slot;
+    const isWeapon = ["melee", "range", "mage"].includes(slot);
     S.inv[i] = null;
-    if (G.SLOTS[slot].kind === "weapon") { if (S.eq.weapon) invAdd(S.eq.weapon) || bankAdd(S.eq.weapon); S.eq.weapon = id; }
-    else { if (S.eq[slot] != null) invAdd(G.itemId(slot, S.eq[slot])) || bankAdd(G.itemId(slot, S.eq[slot])); S.eq[slot] = G.parseItem(id).tier; }
+    const putBack = v => { if (v == null) return; const back = typeof v === "number" ? G.itemId(slot, v) : v; invAdd(back) || bankAdd(back); };
+    if (isWeapon) { putBack(S.eq.weapon); S.eq.weapon = id; }
+    else { putBack(S.eq[slot]); S.eq[slot] = u ? id : G.parseItem(id).tier; }
     styleValid(); rebuildPlayer(); persist();
     renderInv(); renderEquip(); renderCombat(); renderBank();
   }
   function unequip(slotKey) {
-    const id = slotKey === "weapon" ? S.eq.weapon : (S.eq[slotKey] != null ? G.itemId(slotKey, S.eq[slotKey]) : null);
+    const v = S.eq[slotKey];
+    const id = slotKey === "weapon" ? v : v == null ? null : typeof v === "number" ? G.itemId(slotKey, v) : v;
     if (!id) return;
     if (!invAdd(id)) { chat("Dein Inventar ist voll.", "red"); return; }
     if (slotKey === "weapon") S.eq.weapon = null; else S.eq[slotKey] = null;
@@ -1353,6 +1597,30 @@
     S.inv[i] = null; S.pp = Math.min(maxPp(), S.pp + G.POTIONS[0].restore(maxPp()));
     chat("Du trinkst eine Prayer potion."); renderInv(); renderOrbs(); persist();
   }
+  // High Alchemy: Magie 55 + 1 Nature rune (aus der Bank) -> Gold und Magie-XP
+  function canAlch(id) { return id !== "nature_rune" && G.highAlch(id) > 0; }
+  function alch(id, remove) {
+    if (lv().mage < G.ALCH_LEVEL) { chat(`Du brauchst Magie ${G.ALCH_LEVEL} für High Alchemy.`, "red"); return; }
+    if (!(S.bank.nature_rune > 0)) { chat("Du brauchst eine Nature rune (in der Bank).", "red"); return; }
+    S.bank.nature_rune--; remove();
+    const v = G.highAlch(id); S.coins += v;
+    chat(`High Alchemy: ${esc(G.itemName(id))} → <span class="gold">${fmt(v)} Münzen</span>`);
+    animate(P, "mage"); burst2d(P.x + 8, GROUND - 40, "#ffd700", 10);
+    gainXp({ mage: G.ALCH_XP * G.XP_RATE });
+    renderInv(); renderBank(); renderCoins(); persist();
+  }
+  function openClue(i) {
+    S.inv[i] = null;
+    const reward = G.openClue();
+    chat("Du öffnest die Belohnungskiste:", "lvl");
+    for (const [id, n] of reward) {
+      if (id === "coins") S.coins += n; else addLoot(id, n);
+      const v = id === "coins" ? n : G.baseValue(id) * n;
+      chat(`<span style="color:${valueColour(v)}">${esc(id === "coins" ? fmt(n) + " Münzen" : G.itemName(id) + (n > 1 ? " ×" + n : ""))}</span>`);
+      if (v >= 1e6) { lootBeam2d(P.x); fireworks2d(); }
+    }
+    renderInv(); renderBank(); renderCoins(); persist();
+  }
   function sellInv(i) { const id = S.inv[i]; const p = G.sellPrice(id); S.inv[i] = null; S.coins += p; chat(`Verkauft: ${esc(G.itemName(id))} für ${fmt(p)} Münzen.`, "gold"); renderInv(); renderCoins(); persist(); }
 
   // OSRS-artiges Kontextmenue
@@ -1370,12 +1638,15 @@
   function invMenu(e, i) {
     const id = S.inv[i];
     const items = [];
-    if (G.isGear(id)) {
-      const { slot } = G.parseItem(id);
-      items.push({ label: G.SLOTS[slot].kind === "weapon" ? "Führen" : "Tragen", fn: () => equip(i) });
-    } else if (G.bonesOf(id)) items.push({ label: "Vergraben", fn: () => bury(i) });
+    const u = G.ITEMS[id];
+    if (G.isGear(id) || (u && u.slot)) {
+      const slot = u ? u.slot : G.parseItem(id).slot;
+      items.push({ label: ["melee", "range", "mage"].includes(slot) ? "Führen" : "Tragen", fn: () => equip(i) });
+    } else if (u && u.clue) items.push({ label: "Öffnen", fn: () => openClue(i) });
+    else if (G.bonesOf(id)) items.push({ label: "Vergraben", fn: () => bury(i) });
     else if (G.potionOf(id)) items.push({ label: "Trinken", fn: () => drinkAt(i) });
-    else items.push({ label: "Essen", fn: () => eat(i) });
+    else if (G.foodOf(id)) items.push({ label: "Essen", fn: () => eat(i) });
+    if (canAlch(id)) items.push({ label: `High Alch (${fmt(G.highAlch(id))})`, fn: () => alch(id, () => { S.inv[i] = null; }) });
     items.push({ label: "Einlagern", fn: () => { bankAdd(id); S.inv[i] = null; renderInv(); renderBank(); persist(); } });
     items.push({ label: `Verkaufen (${fmt(G.sellPrice(id))})`, fn: () => sellInv(i) });
     showMenu(e, G.itemName(id), items);
@@ -1385,30 +1656,55 @@
     showMenu(e, G.itemName(id), [
       { label: "Abheben", fn: () => { if (invAdd(id)) { S.bank[id]--; renderInv(); renderBank(); persist(); } else chat("Dein Inventar ist voll.", "red"); } },
       { label: "Alle abheben", fn: () => { let k = 0; while (S.bank[id] > 0 && invAdd(id)) { S.bank[id]--; k++; } if (!k) chat("Dein Inventar ist voll.", "red"); renderInv(); renderBank(); persist(); } },
+      ...(canAlch(id) ? [{ label: `High Alch (${fmt(G.highAlch(id))})`, fn: () => alch(id, () => { S.bank[id]--; }) }] : []),
       { label: `Alle verkaufen (${fmt(G.sellPrice(id) * n)})`, fn: () => { S.coins += G.sellPrice(id) * n; S.bank[id] = 0; chat(`Verkauft: ${n}× ${esc(G.itemName(id))}.`, "gold"); renderBank(); renderCoins(); persist(); } },
     ]);
   }
 
   function renderEquip() {
     const box = $("equip"); box.innerHTML = "";
-    const layout = [[null, "helm", null], ["weapon", "body", "shield"], [null, "legs", null]];
+    const layout = [[null, "helm", null], ["cape", "neck", null], ["weapon", "body", "shield"], [null, "legs", null], ["hands", "feet", "ring"]];
+    const NAMES = { weapon: "Waffe", helm: "Kopf", body: "Körper", shield: "Schild", legs: "Beine", neck: "Hals", ring: "Ring", cape: "Umhang", feet: "Füße", hands: "Hände" };
     for (const row of layout) for (const k of row) {
       const d = document.createElement("div");
       if (!k) { d.style.visibility = "hidden"; box.appendChild(d); continue; }
       d.className = "eslot";
-      const id = k === "weapon" ? S.eq.weapon : (S.eq[k] != null ? G.itemId(k, S.eq[k]) : null);
-      d.innerHTML = id ? `<img alt="" src="${icon(id)}">` : `<span class="ph">${{ weapon: "Waffe", helm: "Kopf", body: "Körper", shield: "Schild", legs: "Beine" }[k]}</span>`;
+      const v = S.eq[k];
+      const id = v == null ? null : typeof v === "number" ? G.itemId(k, v) : v;
+      d.innerHTML = id ? `<img alt="" src="${icon(id)}">` : `<span class="ph">${NAMES[k]}</span>`;
       if (id) { d.title = G.itemName(id); d.onclick = e => showMenu(e, G.itemName(id), [{ label: "Ablegen", fn: () => unequip(k) }]); }
       box.appendChild(d);
     }
-    const w = G.weaponOf(S.eq), L = lv();
+    const w = G.weaponOf(S.eq), X = G.extraBonus(S.eq), L = lv();
     const atk = G.playerAttack(L, S.eq, S.style, { def: 1, defBonus: 0 }, boosts());
+    const style = w.slot === "range" ? `+${w.atk + X.atk + X.ratk} Fernkampf` : w.slot === "mage" ? `+${w.atk + X.atk + X.matk} Magie` : `+${w.atk + X.atk} Nahkampf`;
     $("bonuses").innerHTML = `
       <span>Waffe</span><b>${esc(S.eq.weapon ? G.itemName(S.eq.weapon) : "keine")}</b>
-      <span>Angriffsbonus</span><b>+${w.tier >= 0 ? (w.slot === "mage" ? G.W_ATK[w.tier] : G.W_ATK[w.tier]) : 0}</b>
-      <span>${w.slot === "mage" ? "Zauber-Max-Hit" : "Stärkebonus"}</span><b>${w.slot === "mage" ? atk.max : "+" + (w.tier >= 0 ? G.W_STR[w.tier] : 0)}</b>
+      <span>Angriffsbonus</span><b>${style}</b>
+      <span>Stärke Nah / Fern</span><b>+${(w.slot === "melee" ? w.str : 0) + X.str} / +${(w.slot === "range" ? w.str : 0) + X.rstr}</b>
+      <span>Magie-Schaden</span><b>+${X.mdmg} %</b>
       <span>Verteidigungsbonus</span><b>+${G.armourBonus(S.eq)}</b>
       <span>Dein Max-Hit</span><b>${atk.max}</b>`;
+  }
+
+  function renderLoot() {
+    const list = $("lootList"); if (!list) return;
+    const ids = Object.keys(S.loot).sort((a, b) => S.loot[b].gp - S.loot[a].gp);
+    const total = ids.reduce((a, k) => a + S.loot[k].gp, 0), kills = ids.reduce((a, k) => a + S.loot[k].kills, 0);
+    $("lootSum").textContent = ids.length ? `${fmt(kills)} Kills · ${fmt(total)} gp Gesamtwert` : "Noch keine Kills. Dein Loot erscheint hier.";
+    list.innerHTML = "";
+    for (const k of ids) {
+      const T = S.loot[k], m = G.MONSTERS.find(x => x.id === k); if (!m) continue;
+      const el = document.createElement("div"); el.className = "lootmon";
+      el.innerHTML = `<div class="hd2"><span>${esc(m.name)} ×${fmt(T.kills)}</span><b>${fmt(T.gp)} gp</b></div>`;
+      const grid = document.createElement("div"); grid.className = "lootgrid";
+      Object.entries(T.items).sort((a, b) => G.baseValue(b[0]) * b[1] - G.baseValue(a[0]) * a[1]).slice(0, 12).forEach(([id, n]) => {
+        const d = document.createElement("div"); d.className = "slot"; d.title = G.itemName(id);
+        d.innerHTML = `<img alt="" src="${icon(id)}"><span class="q" style="color:${valueColour(G.baseValue(id) * n)}">${n > 1 ? fmt(n) : ""}</span>`;
+        grid.appendChild(d);
+      });
+      el.appendChild(grid); list.appendChild(el);
+    }
   }
 
   function renderPlaces() {
@@ -1434,13 +1730,17 @@
     const box = $("shop"); box.innerHTML = "";
     document.querySelectorAll("#cats .btn").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.cat === shopCat)));
     const L = lv();
-    const owned = id => S.inv.includes(id) || (S.bank[id] > 0) || S.eq.weapon === id || (G.isGear(id) && S.eq[G.parseItem(id).slot] === G.parseItem(id).tier);
+    const owned = id => S.inv.includes(id) || (S.bank[id] > 0) || Object.values(S.eq).includes(id) || (G.isGear(id) && S.eq[G.parseItem(id).slot] === G.parseItem(id).tier);
+    const uniqueRow = id => { const u = G.ITEMS[id], r = G.requirement(id); return { id, name: u.name, req: r ? `Benötigt ${G.SKILL_NAME[r.skill]} ${r.level}` : "Keine Anforderung", ok: !r || L[r.skill] >= r.level, price: Math.round(u.value * 1.1), owned: owned(id) }; };
     const rows = [];
     if (shopCat === "food") {
       for (const f of G.FOOD) rows.push({ id: f.id, name: f.name, req: `Heilt ${f.heal}`, ok: true, price: f.price, food: true });
       for (const p of G.POTIONS) rows.push({ id: p.id, name: p.name, req: "Stellt Gebetspunkte her", ok: true, price: p.price, food: true });
+    } else if (shopCat === "acc") {
+      for (const id in G.ITEMS) { const u = G.ITEMS[id]; if (u.shop && G.EXTRA_SLOTS.includes(u.slot) && !u.set) rows.push(uniqueRow(id)); }
     } else {
       const slots = shopCat === "armour" ? G.ARMOUR_SLOTS : [shopCat];
+      if (shopCat === "range" || shopCat === "mage") for (const id in G.ITEMS) { const u = G.ITEMS[id]; if (u.shop && u.set === shopCat) rows.push(uniqueRow(id)); }
       for (const s of slots) for (let t = 0; t <= 6; t++) {
         const id = G.itemId(s, t), r = G.requirement(id);
         rows.push({ id, name: G.itemName(id), req: `Benötigt ${G.SKILL_NAME[r.skill]} ${r.level}`, ok: L[r.skill] >= r.level, price: G.itemPrice(s, t), owned: owned(id) });
@@ -1448,7 +1748,7 @@
       rows.push({ info: true });
     }
     for (const r of rows) {
-      if (r.info) { const n = document.createElement("div"); n.className = "sub"; n.style.marginTop = "6px"; n.textContent = "Barrows, Bandos und Torva gibt es nur als Drop von Bossen."; box.appendChild(n); continue; }
+      if (r.info) { const n = document.createElement("div"); n.className = "sub"; n.style.marginTop = "6px"; n.textContent = "Barrows, Bandos, Torva, Karil's, Armadyl, Masori, Ahrim's, Infinity und Ancestral gibt es nur als Drop."; box.appendChild(n); continue; }
       const el = document.createElement("div"); el.className = "ware";
       el.innerHTML = `<img alt="" src="${icon(r.id)}"><span class="n">${esc(r.name)} ${r.owned ? '<span class="owned">✓</span>' : ""}</span><span class="r ${r.ok ? "" : "no"}">${esc(r.req)}</span>`;
       const b = document.createElement("button"); b.className = "btn buy";
@@ -1474,6 +1774,7 @@
     if (t.dataset.tab === "opts") renderSaveCode();
     if (t.dataset.tab === "shop") renderShop();
     if (t.dataset.tab === "equip") renderEquip();
+    if (t.dataset.tab === "loot") renderLoot();
   });
   document.querySelectorAll("#cats .btn").forEach(b => b.onclick = () => { shopCat = b.dataset.cat; renderShop(); });
   document.querySelectorAll("#eatRow .btn").forEach(b => b.onclick = () => { S.eatAt = +b.dataset.eat; persist(); renderCombat(); });

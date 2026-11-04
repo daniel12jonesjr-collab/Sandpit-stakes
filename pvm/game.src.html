@@ -119,7 +119,7 @@
 
   /* ---------- Seitenpanel */
   .side { background: var(--panel); border: 2px solid var(--edge); box-shadow: inset 0 0 0 2px var(--panel-hi), inset 0 0 0 4px var(--panel-dark); border-radius: 4px; padding: 6px; }
-  .tabs { display: grid; grid-template-columns: repeat(8, 1fr); gap: 3px; margin-bottom: 6px; }
+  .tabs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 3px; margin-bottom: 6px; }
   .tab {
     height: 40px; display: grid; place-items: center; cursor: pointer;
     background: linear-gradient(#4f4434, #3a3126); border: 2px solid var(--edge); border-radius: 3px;
@@ -165,10 +165,16 @@
   .skillinfo { margin-top: 8px; font-size: 13px; color: #fff; text-shadow: 1px 1px 0 #000; min-height: 34px; text-align: center; }
 
   /* Ausruestung */
-  .equip { display: grid; grid-template-columns: repeat(3, 64px); grid-template-rows: repeat(3, 58px); gap: 6px; justify-content: center; margin-bottom: 10px; }
+  .equip { display: grid; grid-template-columns: repeat(3, 60px); grid-template-rows: repeat(5, 50px); gap: 6px; justify-content: center; margin-bottom: 10px; }
   .eslot { background: var(--slot); border: 1px solid #2a2218; display: grid; place-items: center; cursor: pointer; position: relative; }
   .eslot img { width: 80%; height: 80%; image-rendering: pixelated; }
   .eslot .ph { font-size: 10px; color: #7a6d58; text-align: center; }
+  .lootmon { background: var(--slot); border: 1px solid #2a2218; padding: 6px; margin-bottom: 4px; }
+  .lootmon .hd2 { display: flex; justify-content: space-between; font-size: 14px; color: var(--yellow); text-shadow: 1px 1px 0 #000; }
+  .lootmon .hd2 b { color: var(--orange); font-weight: 500; }
+  .lootgrid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 3px; margin-top: 4px; }
+  .lootgrid .slot { aspect-ratio: 1; }
+  .grounditem { position: absolute; transform: translate(-50%, -100%); font-size: 11px; text-shadow: 1px 1px 0 #000; white-space: nowrap; pointer-events: none; }
   .bonuses { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; font-size: 13px; color: var(--orange); text-shadow: 1px 1px 0 #000; padding: 0 6px; }
   .bonuses b { color: var(--yellow); text-align: right; font-weight: 500; }
 
@@ -201,7 +207,7 @@
   .boss { color: #ff7a1a; font-size: 11px; }
 
   /* Shop */
-  .cats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-bottom: 6px; }
+  .cats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; margin-bottom: 6px; }
   .cats .btn { height: 32px; font-size: 13px; padding: 0 2px; }
   .shop { display: grid; gap: 3px; }
   .ware { display: grid; grid-template-columns: 36px 1fr auto; gap: 1px 8px; align-items: center; background: var(--slot); border: 1px solid #2a2218; padding: 4px 6px; }
@@ -259,6 +265,7 @@
       <button class="tab" data-tab="bank" aria-pressed="false" title="Bank"><svg viewBox="0 0 24 24"><use href="#t-bank"/></svg></button>
       <button class="tab" data-tab="places" aria-pressed="false" title="Orte"><svg viewBox="0 0 24 24"><use href="#t-map"/></svg></button>
       <button class="tab" data-tab="shop" aria-pressed="false" title="Shop"><svg viewBox="0 0 24 24"><use href="#t-shop"/></svg></button>
+      <button class="tab" data-tab="loot" aria-pressed="false" title="Loot-Tracker"><svg viewBox="0 0 24 24"><use href="#t-loot"/></svg></button>
       <button class="tab" data-tab="opts" aria-pressed="false" title="Optionen"><svg viewBox="0 0 24 24"><use href="#t-opts"/></svg></button>
     </div>
 
@@ -311,10 +318,17 @@
         <button class="btn" data-cat="melee" aria-pressed="true">Nah</button>
         <button class="btn" data-cat="range" aria-pressed="false">Fern</button>
         <button class="btn" data-cat="mage" aria-pressed="false">Magie</button>
-        <button class="btn" data-cat="armour" aria-pressed="false">Rüstung</button>
+        <button class="btn" data-cat="armour" aria-pressed="false">Platte</button>
+        <button class="btn" data-cat="acc" aria-pressed="false">Zubehör</button>
         <button class="btn" data-cat="food" aria-pressed="false">Essen</button>
       </div>
       <div class="shop" id="shop"></div>
+    </div>
+
+    <div class="panel" data-panel="loot" hidden>
+      <div class="ptitle">Loot-Tracker</div>
+      <div class="sub" id="lootSum"></div>
+      <div id="lootList"></div>
     </div>
 
     <div class="panel" data-panel="opts" hidden>
@@ -344,6 +358,7 @@
     <g id="t-bank"><rect x="3" y="9" width="18" height="12" fill="#8a6234" stroke="#000"/><path d="M3 9 Q12 2 21 9" fill="#a5773e" stroke="#000"/><rect x="10" y="12" width="4" height="4" fill="#e0c23a" stroke="#000"/></g>
     <g id="t-map"><path d="M3 5 L9 3 L15 5 L21 3 L21 19 L15 21 L9 19 L3 21 Z" fill="#cfbd92" stroke="#000"/><path d="M9 3 L9 19 M15 5 L15 21" stroke="#8a7a5f"/><circle cx="12" cy="11" r="2" fill="#d8402f"/></g>
     <g id="t-shop"><ellipse cx="12" cy="18" rx="8" ry="3" fill="#b8870f" stroke="#000"/><ellipse cx="9" cy="14" rx="5" ry="2.2" fill="#f2c230" stroke="#000"/><ellipse cx="15" cy="12" rx="5" ry="2.2" fill="#f5cf45" stroke="#000"/><ellipse cx="12" cy="8" rx="5" ry="2.2" fill="#ffe27a" stroke="#000"/></g>
+    <g id="t-loot"><rect x="3" y="10" width="18" height="11" fill="#8a6234" stroke="#000"/><path d="M3 10 L6 5 L18 5 L21 10 Z" fill="#a5773e" stroke="#000"/><circle cx="12" cy="14" r="2.5" fill="#ffd700" stroke="#000"/><path d="M19 2 L20 4 L22 4 L20.5 5.5 L21 8 L19 6.5 L17 8 L17.5 5.5 L16 4 L18 4 Z" fill="#fff36a"/></g>
     <g id="t-opts"><circle cx="12" cy="12" r="6" fill="none" stroke="#c9b995" stroke-width="3"/><g stroke="#c9b995" stroke-width="3" stroke-linecap="round"><path d="M12 2 L12 5 M12 19 L12 22 M2 12 L5 12 M19 12 L22 12 M5 5 L7 7 M17 17 L19 19 M5 19 L7 17 M17 7 L19 5"/></g></g>
     <g id="s-att"><path d="M5 19 L17 7 L19 5 L18 9 L7 20 Z" fill="#c9cdd2" stroke="#000"/><path d="M4 16 L8 20" stroke="#b8870f" stroke-width="2.6"/></g>
     <g id="s-str"><path d="M5 10 Q12 4 19 10 L17 13 Q12 9 7 13 Z" fill="#2fa83a" stroke="#000"/><rect x="9" y="12" width="6" height="9" fill="#2fa83a" stroke="#000"/></g>
@@ -361,7 +376,7 @@
 <script>
 (() => {
   "use strict";
-  const VERSION = 2;
+  const VERSION = 3;
   const G = window.Grind;
   const $ = id => document.getElementById(id);
   const rnd = n => Math.floor(Math.random() * n);
@@ -387,7 +402,8 @@
     const s = Object.assign(freshSave(), o || {});
     s.xp = Object.assign({ att: 0, str: 0, def: 0, range: 0, mage: 0, pray: 0, hp: G.XP_TABLE[10] }, s.xp || {});
     s.prayers = Array.isArray(s.prayers) ? s.prayers : []; s.pp = s.pp == null ? 1 : s.pp;
-    s.eq = Object.assign({ weapon: null, helm: null, body: null, legs: null, shield: null }, s.eq || {});
+    s.eq = Object.assign({ weapon: null, helm: null, body: null, legs: null, shield: null, neck: null, ring: null, cape: null, feet: null, hands: null }, s.eq || {});
+    s.loot = s.loot && typeof s.loot === "object" ? s.loot : {};
     s.inv = (Array.isArray(s.inv) ? s.inv : []).concat(new Array(INV_SIZE).fill(null)).slice(0, INV_SIZE);
     s.bank = s.bank && typeof s.bank === "object" ? s.bank : {};
     s.kills = s.kills || {};
@@ -511,12 +527,18 @@
   let fighting = false, tickAcc = 0, regenTimer = 0, deathTimer = 0;
 
   function playerLayers() {
-    const e = S.eq, L = ["p_body"];
-    L.push(e.legs != null ? "p_legs" + e.legs : "p_pants");
-    L.push(e.body != null ? "p_body" + e.body : "p_shirt");
-    L.push(e.helm != null ? "p_helm" + e.helm : "p_hair");
-    if (e.shield != null && G.weaponOf(e).slot !== "range") L.push("p_shield" + e.shield);
-    if (e.weapon) { const w = G.parseItem(e.weapon); L.push("w_" + w.slot + w.tier); }
+    const e = S.eq, L = [];
+    const lay = (slot, v, fallback) => v == null ? fallback : typeof v === "string" ? "p_" + v : "p_" + slot + v;
+    if (e.cape) L.push("p_capeB_" + e.cape);
+    L.push("p_body");
+    if (e.feet) L.push("p_" + e.feet);
+    L.push(lay("legs", e.legs, "p_pants"));
+    L.push(lay("body", e.body, "p_shirt"));
+    if (e.hands) L.push("p_" + e.hands);
+    if (e.cape) L.push("p_capeF_" + e.cape);
+    L.push(lay("helm", e.helm, "p_hair"));
+    if (e.shield != null && G.weaponOf(e).slot !== "range") L.push(lay("shield", e.shield, null));
+    if (e.weapon) { const u = G.ITEMS[e.weapon]; if (u) L.push(u.sprite); else { const w = G.parseItem(e.weapon); L.push("w_" + w.slot + w.tier); } }
     L.forEach(img);
     return L;
   }
@@ -812,6 +834,13 @@
     return best;
   }
 
+  // Wertfarben wie beim Ground-Items-Plugin
+  function valueColour(v) { return v >= 10e6 ? "#ff66ff" : v >= 1e6 ? "#ff9a1a" : v >= 100e3 ? "#5aff5a" : v >= 10e3 ? "#66b2ff" : "#ffffff"; }
+  function addLoot(id, qty) {
+    const it = G.ITEMS[id];
+    if (it && it.mat) bankAdd(id, qty);                   // Materialien stapeln in der Bank
+    else for (let k = 0; k < qty; k++) if (!invAdd(id)) bankAdd(id);
+  }
   function monsterDies() {
     F.dead = true; F.deadT = 0; F.respawn = 4;
     animate(F, "death");
@@ -819,21 +848,53 @@
     const m = F.data;
     const gold = m.gold[0] + rnd(m.gold[1] - m.gold[0] + 1);
     S.coins += gold;
-    let rare = false;
-    const got = [`<span class="gold">${fmt(gold)} Münzen</span>`];
-    if (m.bones) { if (!invAdd(m.bones)) bankAdd(m.bones); got.push(esc(G.itemName(m.bones))); }
-    for (const [id, qty, rate] of m.drops) {
+    const drops = [["coins", gold]];
+    if (m.bones) drops.push([m.bones, 1]);
+    const table = m.drops.concat(m.lvl >= 17 ? G.RARE_TABLE : []);
+    for (const [id, qty, rate] of table) {
       if (Math.random() >= 1 / rate) continue;
-      for (let i = 0; i < qty; i++) {
-        if (!invAdd(id)) bankAdd(id);
-      }
-      if (G.isGear(id)) { rare = true; chat(`Wertvoller Drop: ${esc(G.itemName(id))}${S.inv.includes(id) ? "" : " (in die Bank)"}`, "drop"); }
-      else got.push(esc(G.itemName(id)) + (qty > 1 ? " ×" + qty : ""));
+      const n = G.ITEMS[id] && G.ITEMS[id].mat ? Math.max(1, Math.round(qty * (.6 + Math.random() * .8))) : qty;
+      drops.push([id, n]);
     }
-    if (rare) lootBeam2d(F.x);
+    // Loot-Tracker
+    const T = S.loot[m.id] || (S.loot[m.id] = { kills: 0, gp: 0, items: {} });
+    T.kills++;
+    let best = 0;
+    for (const [id, n] of drops) {
+      if (id !== "coins" && id !== m.bones) addLoot(id, n);
+      const v = id === "coins" ? n : G.baseValue(id) * n;
+      T.gp += v; if (id !== "coins") T.items[id] = (T.items[id] || 0) + n;
+      if (id !== "coins") best = Math.max(best, v);
+      if (id !== "coins" && v >= 100e3) chat(`Wertvoller Drop: ${esc(G.itemName(id))}${n > 1 ? " ×" + n : ""} (${fmt(v)} gp)`, "drop");
+    }
+    showGroundLoot(drops);
+    if (best >= 100e3) lootBeam2d(F.x);
     burst2d(F.x, GROUND - 4, "#ffd700", 8);
-    chat("Loot: " + got.join(", "));
-    renderInv(); renderBank(); renderCoins(); renderPlaces(); persist();
+    chat("Loot: " + drops.filter(d => G.baseValue(d[0]) * d[1] < 100e3 || d[0] === "coins").map(([id, n]) => `<span style="color:${valueColour(id === "coins" ? n : G.baseValue(id) * n)}">${esc(id === "coins" ? fmt(n) + " Münzen" : G.itemName(id) + (n > 1 ? " ×" + n : ""))}</span>`).join(", "));
+    renderInv(); renderBank(); renderCoins(); renderPlaces(); renderLoot(); persist();
+  }
+  // Items fallen sichtbar auf den Boden, mit Namen in Wertfarbe
+  function showGroundLoot(drops) {
+    const shown = drops.slice(0, 6);
+    shown.forEach(([id, n], k) => {
+      const x0 = F.x + (k - (shown.length - 1) / 2) * 12, t0 = performance.now() + k * 90;
+      const im = new Image(); im.src = id === "coins" ? icon("coins") : icon(id);
+      const v = id === "coins" ? n : G.baseValue(id) * n;
+      const label = document.createElement("div"); label.className = "grounditem";
+      label.style.color = valueColour(v);
+      label.textContent = (id === "coins" ? fmt(n) + " Coins" : G.itemName(id) + (n > 1 ? " (" + n + ")" : ""));
+      label.hidden = true; overlay.appendChild(label);
+      fxList.push(now => {
+        const t = (now - t0) / 1000; if (t < 0) return true;
+        if (t > 2.6) { label.remove(); return false; }
+        const y = GROUND + 6 - Math.max(0, Math.sin(Math.min(1, t * 2.2) * Math.PI) * 18) - k % 2 * 6;
+        g.globalAlpha = t > 2.2 ? (2.6 - t) / .4 : 1;
+        if (im.complete) g.drawImage(im, Math.round(x0 - 7), Math.round(y - 14), 14, 14);
+        g.globalAlpha = 1;
+        if (t > .45) { const sp = toScreen(F.x, GROUND - 22 - k * 9); label.hidden = false; label.style.left = sp.x + "px"; label.style.top = sp.y + "px"; label.style.opacity = t > 2.2 ? (2.6 - t) / .4 : 1; }
+        return true;
+      });
+    });
   }
   function playerDies() {
     P.dead = true; P.deadT = 0; fighting = false; deathTimer = 5; S.prayers = [];
@@ -893,6 +954,7 @@
   const iconCache = new Map();
   function icon(id) {
     if (iconCache.has(id)) return iconCache.get(id);
+    if (G.ITEMS[id]) { const url = uniqueIcon(id); iconCache.set(id, url); return url; }
     const c = document.createElement("canvas"); c.width = c.height = 36;
     const g = c.getContext("2d");
     const out = (fn, fill) => { g.save(); g.translate(1, 1); g.fillStyle = "#000"; fn(); g.restore(); g.fillStyle = fill; fn(); };
@@ -947,6 +1009,39 @@
     const url = c.toDataURL();
     iconCache.set(id, url);
     return url;
+  }
+  function uniqueIcon(id) {
+    const u = G.ITEMS[id], c = document.createElement("canvas"); c.width = c.height = 36;
+    const g = c.getContext("2d"); g.lineJoin = "round"; g.lineCap = "round";
+    const col = u.col || "#c8c8c8";
+    const fill = (fn, f) => { g.save(); g.translate(1, 1); g.fillStyle = "#000"; fn(); g.restore(); g.fillStyle = f; fn(); };
+    const line = (fn, f, w) => { g.save(); g.translate(1, 1); g.strokeStyle = "#000"; g.lineWidth = w + 2; fn(); g.stroke(); g.restore(); g.strokeStyle = f; g.lineWidth = w; fn(); g.stroke(); };
+    const slot = u.slot, mat = u.mat;
+    if (u.clue) { fill(() => g.fillRect(6, 9, 24, 18), "#e8dcb0"); g.fillStyle = "#8a6234"; g.fillRect(6, 7, 3, 22); g.fillRect(27, 7, 3, 22); g.fillStyle = "#5a4a3a"; for (let k = 0; k < 4; k++) g.fillRect(11, 12 + k * 4, 14, 1); }
+    else if (mat === "rune") { fill(() => { g.beginPath(); g.arc(18, 18, 11, 0, 7); g.fill(); }, "#8a8a8a"); g.fillStyle = col; g.beginPath(); g.arc(18, 18, 6, 0, 7); g.fill(); }
+    else if (mat === "herb") { fill(() => { g.beginPath(); g.ellipse(14, 18, 6, 12, -.6, 0, 7); g.fill(); g.beginPath(); g.ellipse(22, 18, 6, 12, .6, 0, 7); g.fill(); }, col); g.strokeStyle = "#1a3a10"; g.beginPath(); g.moveTo(18, 30); g.lineTo(18, 8); g.stroke(); }
+    else if (mat === "seed") { for (const [x, y] of [[13, 15], [21, 13], [17, 22], [24, 21]]) fill(() => { g.beginPath(); g.ellipse(x, y, 4, 3, .4, 0, 7); g.fill(); }, col); }
+    else if (mat === "gem") { fill(() => { g.beginPath(); g.moveTo(18, 6); g.lineTo(29, 15); g.lineTo(18, 30); g.lineTo(7, 15); g.closePath(); g.fill(); }, col); g.fillStyle = "rgba(255,255,255,.5)"; g.beginPath(); g.moveTo(18, 8); g.lineTo(24, 15); g.lineTo(18, 15); g.fill(); }
+    else if (mat === "bar") { fill(() => { g.beginPath(); g.moveTo(6, 24); g.lineTo(12, 14); g.lineTo(30, 14); g.lineTo(24, 24); g.closePath(); g.fill(); }, col); }
+    else if (mat === "rare") {
+      if (/platebody/.test(id)) { fill(() => { g.beginPath(); g.moveTo(5, 10); g.lineTo(12, 5); g.lineTo(24, 5); g.lineTo(31, 10); g.lineTo(30, 20); g.lineTo(26, 18); g.lineTo(26, 31); g.lineTo(10, 31); g.lineTo(10, 18); g.lineTo(6, 20); g.closePath(); g.fill(); }, col); g.fillStyle = id.startsWith("third") ? "#e8c040" : "#c8a020"; g.fillRect(16, 6, 4, 25); }
+      else if (/hat/.test(id)) { fill(() => { g.beginPath(); g.moveTo(5, 26); g.quadraticCurveTo(18, 2, 31, 26); g.closePath(); g.fill(); }, col); g.fillStyle = "#c82020"; g.fillRect(24, 6, 3, 14); }
+      else { fill(() => { g.beginPath(); g.moveTo(8, 8); g.lineTo(28, 8); g.lineTo(26, 28); g.lineTo(18, 32); g.lineTo(10, 28); g.closePath(); g.fill(); }, col); g.fillStyle = "#ff4010"; g.fillRect(14, 16, 3, 3); g.fillRect(20, 16, 3, 3); }
+    }
+    else if (slot === "neck") { line(() => { g.beginPath(); g.arc(18, 12, 10, .2, Math.PI - .2); }, "#e8c040", 2); fill(() => { g.beginPath(); g.arc(18, 25, 6, 0, 7); g.fill(); }, col); }
+    else if (slot === "ring") { line(() => { g.beginPath(); g.arc(18, 20, 8, 0, 7); }, "#e8c040", 3); fill(() => { g.beginPath(); g.arc(18, 11, 4, 0, 7); g.fill(); }, col); }
+    else if (slot === "cape") { fill(() => { g.beginPath(); g.moveTo(10, 4); g.lineTo(26, 4); g.lineTo(31, 32); g.lineTo(5, 32); g.closePath(); g.fill(); }, col); g.fillStyle = "rgba(0,0,0,.25)"; g.fillRect(17, 5, 2, 26); }
+    else if (slot === "feet") { fill(() => { g.fillRect(6, 10, 9, 16); g.fillRect(6, 22, 13, 6); g.fillRect(19, 10, 9, 16); g.fillRect(19, 22, 13, 6); }, col); }
+    else if (slot === "hands") { fill(() => { g.fillRect(6, 10, 10, 16); g.fillRect(4, 14, 3, 7); g.fillRect(20, 10, 10, 16); g.fillRect(29, 14, 3, 7); }, col); }
+    else if (slot === "melee") {
+      if (id === "abyssal_whip") { line(() => { g.beginPath(); g.moveTo(8, 28); g.bezierCurveTo(30, 26, 4, 14, 26, 6); }, col, 3); g.fillStyle = "#2a2a2a"; g.fillRect(5, 26, 6, 6); }
+      else { line(() => { g.beginPath(); g.moveTo(8, 30); g.lineTo(24, 10); }, "#6b4a26", 3); fill(() => g.fillRect(18, 3, 14, 12), col); }
+    }
+    else if (slot === "range") { line(() => { g.beginPath(); g.moveTo(8, 4); g.quadraticCurveTo(34, 18, 8, 32); }, col, 3); g.strokeStyle = "#e8e0c8"; g.lineWidth = 1; g.beginPath(); g.moveTo(8, 4); g.lineTo(8, 32); g.stroke(); }
+    else if (slot === "helm") { fill(() => { g.beginPath(); g.moveTo(7, 30); g.lineTo(7, 14); g.quadraticCurveTo(18, 0, 29, 14); g.lineTo(29, 30); g.closePath(); g.fill(); }, col); if (u.set === "mage") { g.fillStyle = col; g.beginPath(); g.moveTo(10, 14); g.lineTo(18, 0); g.lineTo(26, 14); g.fill(); } else { g.fillStyle = "#111"; g.fillRect(10, 17, 16, 3); } }
+    else if (slot === "body") { fill(() => { g.beginPath(); g.moveTo(5, 10); g.lineTo(12, 5); g.lineTo(24, 5); g.lineTo(31, 10); g.lineTo(30, 20); g.lineTo(26, 18); g.lineTo(26, u.set === "mage" ? 33 : 31); g.lineTo(10, u.set === "mage" ? 33 : 31); g.lineTo(10, 18); g.lineTo(6, 20); g.closePath(); g.fill(); }, col); g.fillStyle = "rgba(0,0,0,.25)"; g.fillRect(17, 6, 2, 25); }
+    else if (slot === "legs") { fill(() => { g.beginPath(); g.moveTo(9, 5); g.lineTo(27, 5); g.lineTo(28, 31); g.lineTo(20, 31); g.lineTo(18, 14); g.lineTo(16, 31); g.lineTo(8, 31); g.closePath(); g.fill(); }, col); }
+    return c.toDataURL();
   }
   function monsterIcon(m) {
     const key = "mon:" + m.id;
@@ -1081,15 +1176,19 @@
     const id = S.inv[i];
     const r = G.requirement(id);
     if (!meetsReq(id)) { chat(`Du brauchst Stufe ${r.level} ${G.SKILL_NAME[r.skill]}, um das zu tragen.`, "red"); return; }
-    const { slot } = G.parseItem(id);
+    const u = G.ITEMS[id];
+    const slot = u ? u.slot : G.parseItem(id).slot;
+    const isWeapon = ["melee", "range", "mage"].includes(slot);
     S.inv[i] = null;
-    if (G.SLOTS[slot].kind === "weapon") { if (S.eq.weapon) invAdd(S.eq.weapon) || bankAdd(S.eq.weapon); S.eq.weapon = id; }
-    else { if (S.eq[slot] != null) invAdd(G.itemId(slot, S.eq[slot])) || bankAdd(G.itemId(slot, S.eq[slot])); S.eq[slot] = G.parseItem(id).tier; }
+    const putBack = v => { if (v == null) return; const back = typeof v === "number" ? G.itemId(slot, v) : v; invAdd(back) || bankAdd(back); };
+    if (isWeapon) { putBack(S.eq.weapon); S.eq.weapon = id; }
+    else { putBack(S.eq[slot]); S.eq[slot] = u ? id : G.parseItem(id).tier; }
     styleValid(); rebuildPlayer(); persist();
     renderInv(); renderEquip(); renderCombat(); renderBank();
   }
   function unequip(slotKey) {
-    const id = slotKey === "weapon" ? S.eq.weapon : (S.eq[slotKey] != null ? G.itemId(slotKey, S.eq[slotKey]) : null);
+    const v = S.eq[slotKey];
+    const id = slotKey === "weapon" ? v : v == null ? null : typeof v === "number" ? G.itemId(slotKey, v) : v;
     if (!id) return;
     if (!invAdd(id)) { chat("Dein Inventar ist voll.", "red"); return; }
     if (slotKey === "weapon") S.eq.weapon = null; else S.eq[slotKey] = null;
@@ -1113,6 +1212,30 @@
     S.inv[i] = null; S.pp = Math.min(maxPp(), S.pp + G.POTIONS[0].restore(maxPp()));
     chat("Du trinkst eine Prayer potion."); renderInv(); renderOrbs(); persist();
   }
+  // High Alchemy: Magie 55 + 1 Nature rune (aus der Bank) -> Gold und Magie-XP
+  function canAlch(id) { return id !== "nature_rune" && G.highAlch(id) > 0; }
+  function alch(id, remove) {
+    if (lv().mage < G.ALCH_LEVEL) { chat(`Du brauchst Magie ${G.ALCH_LEVEL} für High Alchemy.`, "red"); return; }
+    if (!(S.bank.nature_rune > 0)) { chat("Du brauchst eine Nature rune (in der Bank).", "red"); return; }
+    S.bank.nature_rune--; remove();
+    const v = G.highAlch(id); S.coins += v;
+    chat(`High Alchemy: ${esc(G.itemName(id))} → <span class="gold">${fmt(v)} Münzen</span>`);
+    animate(P, "mage"); burst2d(P.x + 8, GROUND - 40, "#ffd700", 10);
+    gainXp({ mage: G.ALCH_XP * G.XP_RATE });
+    renderInv(); renderBank(); renderCoins(); persist();
+  }
+  function openClue(i) {
+    S.inv[i] = null;
+    const reward = G.openClue();
+    chat("Du öffnest die Belohnungskiste:", "lvl");
+    for (const [id, n] of reward) {
+      if (id === "coins") S.coins += n; else addLoot(id, n);
+      const v = id === "coins" ? n : G.baseValue(id) * n;
+      chat(`<span style="color:${valueColour(v)}">${esc(id === "coins" ? fmt(n) + " Münzen" : G.itemName(id) + (n > 1 ? " ×" + n : ""))}</span>`);
+      if (v >= 1e6) { lootBeam2d(P.x); fireworks2d(); }
+    }
+    renderInv(); renderBank(); renderCoins(); persist();
+  }
   function sellInv(i) { const id = S.inv[i]; const p = G.sellPrice(id); S.inv[i] = null; S.coins += p; chat(`Verkauft: ${esc(G.itemName(id))} für ${fmt(p)} Münzen.`, "gold"); renderInv(); renderCoins(); persist(); }
 
   // OSRS-artiges Kontextmenue
@@ -1130,12 +1253,15 @@
   function invMenu(e, i) {
     const id = S.inv[i];
     const items = [];
-    if (G.isGear(id)) {
-      const { slot } = G.parseItem(id);
-      items.push({ label: G.SLOTS[slot].kind === "weapon" ? "Führen" : "Tragen", fn: () => equip(i) });
-    } else if (G.bonesOf(id)) items.push({ label: "Vergraben", fn: () => bury(i) });
+    const u = G.ITEMS[id];
+    if (G.isGear(id) || (u && u.slot)) {
+      const slot = u ? u.slot : G.parseItem(id).slot;
+      items.push({ label: ["melee", "range", "mage"].includes(slot) ? "Führen" : "Tragen", fn: () => equip(i) });
+    } else if (u && u.clue) items.push({ label: "Öffnen", fn: () => openClue(i) });
+    else if (G.bonesOf(id)) items.push({ label: "Vergraben", fn: () => bury(i) });
     else if (G.potionOf(id)) items.push({ label: "Trinken", fn: () => drinkAt(i) });
-    else items.push({ label: "Essen", fn: () => eat(i) });
+    else if (G.foodOf(id)) items.push({ label: "Essen", fn: () => eat(i) });
+    if (canAlch(id)) items.push({ label: `High Alch (${fmt(G.highAlch(id))})`, fn: () => alch(id, () => { S.inv[i] = null; }) });
     items.push({ label: "Einlagern", fn: () => { bankAdd(id); S.inv[i] = null; renderInv(); renderBank(); persist(); } });
     items.push({ label: `Verkaufen (${fmt(G.sellPrice(id))})`, fn: () => sellInv(i) });
     showMenu(e, G.itemName(id), items);
@@ -1145,30 +1271,55 @@
     showMenu(e, G.itemName(id), [
       { label: "Abheben", fn: () => { if (invAdd(id)) { S.bank[id]--; renderInv(); renderBank(); persist(); } else chat("Dein Inventar ist voll.", "red"); } },
       { label: "Alle abheben", fn: () => { let k = 0; while (S.bank[id] > 0 && invAdd(id)) { S.bank[id]--; k++; } if (!k) chat("Dein Inventar ist voll.", "red"); renderInv(); renderBank(); persist(); } },
+      ...(canAlch(id) ? [{ label: `High Alch (${fmt(G.highAlch(id))})`, fn: () => alch(id, () => { S.bank[id]--; }) }] : []),
       { label: `Alle verkaufen (${fmt(G.sellPrice(id) * n)})`, fn: () => { S.coins += G.sellPrice(id) * n; S.bank[id] = 0; chat(`Verkauft: ${n}× ${esc(G.itemName(id))}.`, "gold"); renderBank(); renderCoins(); persist(); } },
     ]);
   }
 
   function renderEquip() {
     const box = $("equip"); box.innerHTML = "";
-    const layout = [[null, "helm", null], ["weapon", "body", "shield"], [null, "legs", null]];
+    const layout = [[null, "helm", null], ["cape", "neck", null], ["weapon", "body", "shield"], [null, "legs", null], ["hands", "feet", "ring"]];
+    const NAMES = { weapon: "Waffe", helm: "Kopf", body: "Körper", shield: "Schild", legs: "Beine", neck: "Hals", ring: "Ring", cape: "Umhang", feet: "Füße", hands: "Hände" };
     for (const row of layout) for (const k of row) {
       const d = document.createElement("div");
       if (!k) { d.style.visibility = "hidden"; box.appendChild(d); continue; }
       d.className = "eslot";
-      const id = k === "weapon" ? S.eq.weapon : (S.eq[k] != null ? G.itemId(k, S.eq[k]) : null);
-      d.innerHTML = id ? `<img alt="" src="${icon(id)}">` : `<span class="ph">${{ weapon: "Waffe", helm: "Kopf", body: "Körper", shield: "Schild", legs: "Beine" }[k]}</span>`;
+      const v = S.eq[k];
+      const id = v == null ? null : typeof v === "number" ? G.itemId(k, v) : v;
+      d.innerHTML = id ? `<img alt="" src="${icon(id)}">` : `<span class="ph">${NAMES[k]}</span>`;
       if (id) { d.title = G.itemName(id); d.onclick = e => showMenu(e, G.itemName(id), [{ label: "Ablegen", fn: () => unequip(k) }]); }
       box.appendChild(d);
     }
-    const w = G.weaponOf(S.eq), L = lv();
+    const w = G.weaponOf(S.eq), X = G.extraBonus(S.eq), L = lv();
     const atk = G.playerAttack(L, S.eq, S.style, { def: 1, defBonus: 0 }, boosts());
+    const style = w.slot === "range" ? `+${w.atk + X.atk + X.ratk} Fernkampf` : w.slot === "mage" ? `+${w.atk + X.atk + X.matk} Magie` : `+${w.atk + X.atk} Nahkampf`;
     $("bonuses").innerHTML = `
       <span>Waffe</span><b>${esc(S.eq.weapon ? G.itemName(S.eq.weapon) : "keine")}</b>
-      <span>Angriffsbonus</span><b>+${w.tier >= 0 ? (w.slot === "mage" ? G.W_ATK[w.tier] : G.W_ATK[w.tier]) : 0}</b>
-      <span>${w.slot === "mage" ? "Zauber-Max-Hit" : "Stärkebonus"}</span><b>${w.slot === "mage" ? atk.max : "+" + (w.tier >= 0 ? G.W_STR[w.tier] : 0)}</b>
+      <span>Angriffsbonus</span><b>${style}</b>
+      <span>Stärke Nah / Fern</span><b>+${(w.slot === "melee" ? w.str : 0) + X.str} / +${(w.slot === "range" ? w.str : 0) + X.rstr}</b>
+      <span>Magie-Schaden</span><b>+${X.mdmg} %</b>
       <span>Verteidigungsbonus</span><b>+${G.armourBonus(S.eq)}</b>
       <span>Dein Max-Hit</span><b>${atk.max}</b>`;
+  }
+
+  function renderLoot() {
+    const list = $("lootList"); if (!list) return;
+    const ids = Object.keys(S.loot).sort((a, b) => S.loot[b].gp - S.loot[a].gp);
+    const total = ids.reduce((a, k) => a + S.loot[k].gp, 0), kills = ids.reduce((a, k) => a + S.loot[k].kills, 0);
+    $("lootSum").textContent = ids.length ? `${fmt(kills)} Kills · ${fmt(total)} gp Gesamtwert` : "Noch keine Kills. Dein Loot erscheint hier.";
+    list.innerHTML = "";
+    for (const k of ids) {
+      const T = S.loot[k], m = G.MONSTERS.find(x => x.id === k); if (!m) continue;
+      const el = document.createElement("div"); el.className = "lootmon";
+      el.innerHTML = `<div class="hd2"><span>${esc(m.name)} ×${fmt(T.kills)}</span><b>${fmt(T.gp)} gp</b></div>`;
+      const grid = document.createElement("div"); grid.className = "lootgrid";
+      Object.entries(T.items).sort((a, b) => G.baseValue(b[0]) * b[1] - G.baseValue(a[0]) * a[1]).slice(0, 12).forEach(([id, n]) => {
+        const d = document.createElement("div"); d.className = "slot"; d.title = G.itemName(id);
+        d.innerHTML = `<img alt="" src="${icon(id)}"><span class="q" style="color:${valueColour(G.baseValue(id) * n)}">${n > 1 ? fmt(n) : ""}</span>`;
+        grid.appendChild(d);
+      });
+      el.appendChild(grid); list.appendChild(el);
+    }
   }
 
   function renderPlaces() {
@@ -1194,13 +1345,17 @@
     const box = $("shop"); box.innerHTML = "";
     document.querySelectorAll("#cats .btn").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.cat === shopCat)));
     const L = lv();
-    const owned = id => S.inv.includes(id) || (S.bank[id] > 0) || S.eq.weapon === id || (G.isGear(id) && S.eq[G.parseItem(id).slot] === G.parseItem(id).tier);
+    const owned = id => S.inv.includes(id) || (S.bank[id] > 0) || Object.values(S.eq).includes(id) || (G.isGear(id) && S.eq[G.parseItem(id).slot] === G.parseItem(id).tier);
+    const uniqueRow = id => { const u = G.ITEMS[id], r = G.requirement(id); return { id, name: u.name, req: r ? `Benötigt ${G.SKILL_NAME[r.skill]} ${r.level}` : "Keine Anforderung", ok: !r || L[r.skill] >= r.level, price: Math.round(u.value * 1.1), owned: owned(id) }; };
     const rows = [];
     if (shopCat === "food") {
       for (const f of G.FOOD) rows.push({ id: f.id, name: f.name, req: `Heilt ${f.heal}`, ok: true, price: f.price, food: true });
       for (const p of G.POTIONS) rows.push({ id: p.id, name: p.name, req: "Stellt Gebetspunkte her", ok: true, price: p.price, food: true });
+    } else if (shopCat === "acc") {
+      for (const id in G.ITEMS) { const u = G.ITEMS[id]; if (u.shop && G.EXTRA_SLOTS.includes(u.slot) && !u.set) rows.push(uniqueRow(id)); }
     } else {
       const slots = shopCat === "armour" ? G.ARMOUR_SLOTS : [shopCat];
+      if (shopCat === "range" || shopCat === "mage") for (const id in G.ITEMS) { const u = G.ITEMS[id]; if (u.shop && u.set === shopCat) rows.push(uniqueRow(id)); }
       for (const s of slots) for (let t = 0; t <= 6; t++) {
         const id = G.itemId(s, t), r = G.requirement(id);
         rows.push({ id, name: G.itemName(id), req: `Benötigt ${G.SKILL_NAME[r.skill]} ${r.level}`, ok: L[r.skill] >= r.level, price: G.itemPrice(s, t), owned: owned(id) });
@@ -1208,7 +1363,7 @@
       rows.push({ info: true });
     }
     for (const r of rows) {
-      if (r.info) { const n = document.createElement("div"); n.className = "sub"; n.style.marginTop = "6px"; n.textContent = "Barrows, Bandos und Torva gibt es nur als Drop von Bossen."; box.appendChild(n); continue; }
+      if (r.info) { const n = document.createElement("div"); n.className = "sub"; n.style.marginTop = "6px"; n.textContent = "Barrows, Bandos, Torva, Karil's, Armadyl, Masori, Ahrim's, Infinity und Ancestral gibt es nur als Drop."; box.appendChild(n); continue; }
       const el = document.createElement("div"); el.className = "ware";
       el.innerHTML = `<img alt="" src="${icon(r.id)}"><span class="n">${esc(r.name)} ${r.owned ? '<span class="owned">✓</span>' : ""}</span><span class="r ${r.ok ? "" : "no"}">${esc(r.req)}</span>`;
       const b = document.createElement("button"); b.className = "btn buy";
@@ -1234,6 +1389,7 @@
     if (t.dataset.tab === "opts") renderSaveCode();
     if (t.dataset.tab === "shop") renderShop();
     if (t.dataset.tab === "equip") renderEquip();
+    if (t.dataset.tab === "loot") renderLoot();
   });
   document.querySelectorAll("#cats .btn").forEach(b => b.onclick = () => { shopCat = b.dataset.cat; renderShop(); });
   document.querySelectorAll("#eatRow .btn").forEach(b => b.onclick = () => { S.eatAt = +b.dataset.eat; persist(); renderCombat(); });

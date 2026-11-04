@@ -10,6 +10,12 @@ Pixel-Rollenspiel fürs iPhone: an Spots von **Chicken bis Nex** kämpfen, Skill
 - Gebete: Schutzgebete, Piety, Rigour, Augury u. a., Prayer potions, Knochen vergraben
 - 10 Ausrüstungsstufen je Waffe/Rüstung, Shop bis Dragon, Barrows/Bandos/Torva nur als Boss-Drop
 - Inventar (28), Bank, Auto-Essen, Spielstand-Code
+- **Member-Items:** Amulett-, Ring-, Umhang-, Stiefel- und Handschuh-Slot (Glory, Fury, Torture, Anguish, Occult, Berserker/Archers/Seers/Ultor ring, Fire/Infernal cape, Dragon/Primordial/Eternal/Ranger boots, Barrows/Ferocious gloves)
+- **Fernkampf- und Magie-Rüstung:** d'hide (Green bis Black), Karil's, Armadyl, Masori; Wizard, Mystic, Infinity, Ahrim's, Ancestral
+- **Defensive Stile:** Weitschuss (Fernkampf + Verteidigung), Defensiv zaubern (Magie + Verteidigung)
+- **Slayer-Gegner mit Uniques:** Gargoyle (Granite maul), Abyssal demon (Abyssal whip), Dark beast (Dark bow), King Black Dragon (Draconic visage)
+- **Loot:** sichtbar auf dem Boden mit Wertfarben, Runen/Kräuter/Samen/Edelsteine/Barren stapeln in der Bank, Clue scrolls mit Belohnungskisten, Loot-Tracker
+- **High Alchemy** aus Inventar und Bank (Magie 55, Nature rune)
 
 ## Grafik und Lizenzen
 Figuren aus dem **Liberated Pixel Cup (LPC)** über den Universal LPC Spritesheet Character Generator

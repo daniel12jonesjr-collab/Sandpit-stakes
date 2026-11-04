@@ -187,6 +187,74 @@ mon("graardor", [B + "muscular/dark_green.png", first(H + "orc/male.png"), legs_
 mon("nex", [B + "male/lavender.png", first(H + "human/male/lavender.png"), legs_b, torso_b, helm_path("horned")],
     tints={0: ("#100018", "#7a5aa0", "#e0c8ff"), 1: ("#100018", "#7a5aa0", "#e0c8ff"), 2: ("#0a0010", "#3a2a5a", "#a08ad0"), 3: ("#0a0010", "#3a2a5a", "#a08ad0"), 4: ("#0a0010", "#3a2a5a", "#c0a8f0")})
 
+# ---------------- Member-Ruestung, Umhaenge, Stiefel, Handschuhe, neue Waffen und Monster
+def find(prefix, *prefer):
+    cands = sorted(p for p in FILES if p.startswith(prefix) and p.endswith(".png"))
+    for want in prefer:
+        for c in cands:
+            if c.endswith("/" + want + ".png"): return c
+    if not cands: raise SystemExit("Nicht gefunden: " + prefix)
+    return cands[0]
+def shade(hexcol, f):
+    h = hexcol.lstrip("#"); r, g, b = (int(h[i:i + 2], 16) for i in (0, 2, 4))
+    return "#%02x%02x%02x" % tuple(max(0, min(255, int(v * f))) for v in (r, g, b))
+def tri(col): return (shade(col, .25), col, shade(col, 1.9))
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+import json as _j, re as _re
+eng = (Path(__file__).resolve().parent.parent / "engine.js").read_text()
+sets = _re.findall(r'\["(\w+)", "([^"]+)", "(helm|body|legs|hands)", \["(range|mage)", \d+\][^\]]*?"(#[0-9a-f]{6})"', eng)
+LEATHER = find(P + "torso/armour/leather/male/", "brown", "leather")
+SLEEVE = find(P + "torso/clothes/longsleeve/", "white", "gray", "blue")
+HOSE = find(P + "legs/hose/male/", "brown", "gray")
+PANTA = find(P + "legs/pantaloons/male/", "white", "gray", "blue")
+HOOD = find(P + "hat/cloth/hood/adult/", "gray", "brown")
+WIZ = find(P + "hat/magic/wizard/base/adult/", "base_gray", "gray", "blue")
+BRACER = find(P + "arms/bracers/male/", "steel", "iron", "bronze")
+BOOTS = find(P + "feet/boots/male/", "brown", "black") if any(f.startswith(P + "feet/boots/male/") for f in FILES) else find(P + "feet/boots/", "brown")
+CAPE_F = find(P + "cape/solid/male/", "gray", "black"); CAPE_B = find(P + "cape/solid_behind/", "gray", "black")
+for sid, name, slot, style, col in sets:
+    t = tri(col)
+    if slot == "body":
+        if sid.startswith(("armadyl", "masori")): layers, tints = [arms_b, torso_b], [t, t]
+        elif style == "range": layers, tints = [SLEEVE, LEATHER], [tri(shade(col, .7)), t]
+        else: layers, tints = [SLEEVE], [t]
+    elif slot == "legs":
+        if sid.startswith(("armadyl", "masori")): layers, tints = [legs_b, feet_b], [t, t]
+        elif style == "range": layers, tints = [HOSE], [t]
+        else: layers, tints = [PANTA], [t]
+    elif slot == "helm":
+        if sid.startswith("armadyl"): layers, tints = [helm_path("armet")], [t]
+        elif sid.startswith("masori"): layers, tints = [helm_path("close")], [t]
+        elif sid in ("coif", "karils_coif", "ahrims_hood"): layers, tints = [HOOD], [t]
+        else: layers, tints = [WIZ], [t]
+    else:
+        layers, tints = [BRACER], [t]
+    img = None
+    for lp, tt in zip(layers, tints): img = merge(img, colorize(load(lp), *tt))
+    save("p_" + sid, universal_to_atlas(img, "R"))
+# Handschuhe, Stiefel, Umhaenge aus den Zubehoer-Items
+acc = _re.findall(r'(\w+): U\(\{ name: "([^"]+)", slot: "(feet|hands|cape)".*?col: "(#[0-9a-f]{6})"', eng)
+for sid, name, slot, col in acc:
+    t = tri(col)
+    if slot == "hands": save("p_" + sid, universal_to_atlas(colorize(load(BRACER), *t), "R"))
+    elif slot == "feet": save("p_" + sid, universal_to_atlas(colorize(load(BOOTS), *t), "R"))
+    else:
+        save("p_capeF_" + sid, universal_to_atlas(colorize(load(CAPE_F), *t), "R"))
+        save("p_capeB_" + sid, universal_to_atlas(colorize(load(CAPE_B), *t), "R"))
+# Einzigartige Waffen
+weapon_atlas("w_whip", slash=sci_s, walk=sci_w, tint=("#120612", "#4a1a4a", "#c08ac0"))
+weapon_atlas("w_maul", slash=club_s, tint=("#101010", "#6a6a6a", "#d0d0d0"))
+weapon_atlas("w_darkbow", universal=bow_fg, behind=bow_bg, tint=("#050008", "#2a1a3a", "#9a7ac8"))
+# Stufe 7 Nahkampf ist jetzt Dharok's greataxe
+weapon_atlas("w_melee7", slash=axe_s, tint=("#101010", "#5a5a5a", "#c0c0c0"))
+# Neue Monster
+mon("gargoyle", [B + "muscular/black.png", first(H + "troll/adult.png"), pants("charcoal")], tints={0: ("#101010", "#6a6a64", "#c8c8c0"), 1: ("#101010", "#6a6a64", "#d8d8d0"), 2: ("#000000", "#3a3a38", "#8a8a88")})
+mon("abyssal", [B + "muscular/black.png", first(H + "minotaur/male.png")], tints={0: ("#100010", "#6a1a5a", "#e080c8"), 1: ("#100010", "#8a2a6a", "#ff9ae0")})
+boar = first(H + "boarman/male.png", H + "boarman/adult.png") if any(f.startswith(H + "boarman/") for f in FILES) else first(H + "minotaur/male.png")
+mon("darkbeast", [B + "muscular/black.png", boar, pants("black")], tints={0: ("#000000", "#2a2a2a", "#6a6a6a"), 1: ("#000000", "#2a2a2a", "#7a7a7a")}, slash=club_s, wtint=("#000000", "#3a2a2a", "#8a6a6a"))
+mon("kbd", [B + "muscular/black.png", first(H + "lizard/male.png"), helm_path("horned")], tints={0: ("#000000", "#1a1a1e", "#5a5a6a"), 1: ("#000000", "#22222a", "#6a6a7a"), 2: ("#000000", "#3a3a3a", "#c8c0b0")}, slash=sci_s, wtint=("#000000", "#2a2a30", "#8a8a9a"))
+
 # ---------------- Lizenz-Nachweis nur fuer die genutzten Dateien
 rows = []
 credits_txt = subprocess.run(["git", "-C", str(REPO), "show", "HEAD:CREDITS.csv"], capture_output=True, text=True).stdout
