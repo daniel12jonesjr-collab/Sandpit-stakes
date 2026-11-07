@@ -360,7 +360,7 @@
 <script>
 (() => {
   "use strict";
-  const VERSION = 2;
+  const VERSION = 3;
   const $ = id => document.getElementById(id);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
   const uid = () => Math.random().toString(36).slice(2, 10);
@@ -754,21 +754,19 @@
   }
   function renderAll() { if (view === "day") renderDay(); else if (view === "week") renderWeek(); else if (view === "meals") renderMeals(); else renderFamily(); }
 
-  // Beispiel-Eintraege beim allerersten Start, damit man sieht, wie es aussieht
-  if (!S.seeded) {
-    const t = today(), mon = monday(t);
-    const add = o => S.items.push(Object.assign({ id: uid(), emoji: "", repeat: "none", time: "", end: "", who: [], note: "", date: t }, o));
-    add({ type: "act", title: "Kita bringen", emoji: "🏫", time: "07:45", repeat: "weekdays", date: mon, who: ["k1", "k2"] });
-    add({ type: "act", title: "Kita abholen", emoji: "🚗", time: "15:00", repeat: "weekdays", date: mon, who: ["k1", "k2"] });
-    add({ type: "act", title: "Mittagsschlaf", emoji: "😴", time: "12:30", end: "14:00", repeat: "daily", date: mon, who: ["k3"] });
-    add({ type: "act", title: "Kinderturnen", emoji: "🤸", time: "16:30", end: "17:30", repeat: "weekly", date: addDays(mon, 2), who: ["k1"], note: "Turnbeutel mitnehmen" });
-    add({ type: "act", title: "Baden & Vorlesen", emoji: "🛁", time: "18:30", repeat: "daily", date: mon, who: ["k1", "k2", "k3"] });
-    add({ type: "meal", slot: "breakfast", title: "Müsli mit Obst", date: t });
-    add({ type: "meal", slot: "lunch", title: "Nudeln mit Tomatensoße", date: t });
-    add({ type: "meal", slot: "dinner", title: "Brot mit Aufschnitt", date: t });
-    add({ type: "todo", title: "Brotdosen packen", emoji: "🍱", repeat: "weekdays", date: mon });
-    add({ type: "todo", title: "Wäsche waschen", emoji: "🧺", date: t });
-    S.seeded = true; save();
+  // Frühere Beispiel-Einträge (Version 1–2) einmalig entfernen. Nur exakt passende Einträge,
+  // selbst angelegte Einträge bleiben erhalten.
+  if (!S.seedRemoved) {
+    const SEED = [["act", "Kita bringen", "07:45", "weekdays"], ["act", "Kita abholen", "15:00", "weekdays"], ["act", "Mittagsschlaf", "12:30", "daily"],
+      ["act", "Kinderturnen", "16:30", "weekly"], ["act", "Baden & Vorlesen", "18:30", "daily"], ["meal", "Müsli mit Obst", "", "none"],
+      ["meal", "Nudeln mit Tomatensoße", "", "none"], ["meal", "Brot mit Aufschnitt", "", "none"], ["todo", "Brotdosen packen", "", "weekdays"], ["todo", "Wäsche waschen", "", "none"]];
+    if (S.seeded) {
+      const gone = new Set();
+      S.items = S.items.filter(it => { const hit = SEED.some(([t, ti, tm, rp]) => it.type === t && it.title === ti && (it.time || "") === tm && it.repeat === rp); if (hit) gone.add(it.id); return !hit; });
+      for (const k of Object.keys(S.done)) if (gone.has(k.split("|")[0])) delete S.done[k];
+      for (const k of Object.keys(S.skip)) if (gone.has(k.split("|")[0])) delete S.skip[k];
+    }
+    S.seedRemoved = true; save();
   }
 
   setView("day");

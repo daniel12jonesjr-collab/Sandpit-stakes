@@ -1,7 +1,7 @@
 // Offline-Speicher fuer die installierte App.
 // Seite + version.json: immer erst frisch aus dem Netz (Updates kommen sofort an), ohne Netz aus dem Speicher.
 // Icons und Schriften: erst Speicher, sonst Netz.
-const CACHE = "familienplaner-v2";
+const CACHE = "familienplaner-v3";
 const FILES = ["./", "index.html", "manifest.webmanifest", "icon-180.png", "icon-512.png"];
 
 self.addEventListener("install", e => {
