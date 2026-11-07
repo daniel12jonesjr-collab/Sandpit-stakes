@@ -1,0 +1,692 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Familienplaner</title>
+<meta name="description" content="Wochenplaner für den Familienalltag: Termine, Essen und To-Dos für jeden Tag, zum Abhaken.">
+<meta name="theme-color" content="#fbf3ee">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Planer">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Nunito:wght@400;600;700;800&display=swap">
+<style>
+  :root {
+    --cream: #fbf3ee; --cream2: #f6e9e2; --card: #fffaf7; --blush: #f9e1e6; --blush2: #f3cbd5;
+    --rose: #e58aa3; --rose-d: #c4587a; --berry: #9c3d5e; --text: #4b343e; --muted: #9a8790; --line: #efdcd8;
+    --sage: #8dbf9e; --sage-l: #e3f1e7; --gold: #e8b46a; --peach: #f5c6a5;
+    --act: #e58aa3; --meal: #e8a86a; --todo: #8f9fd8;
+    --shadow: 0 6px 20px rgba(156, 61, 94, .08), 0 1px 3px rgba(156, 61, 94, .06);
+    --r: 20px;
+    --serif: "Fraunces", Georgia, serif; --sans: "Nunito", -apple-system, "SF Pro Rounded", system-ui, sans-serif;
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; background: var(--cream); color: var(--text); font: 16px/1.4 var(--sans); }
+  body { min-height: 100dvh; }
+  button { font: inherit; color: inherit; }
+  .app { max-width: 560px; margin: 0 auto; padding: max(14px, env(safe-area-inset-top)) 16px calc(96px + env(safe-area-inset-bottom)); }
+  h1, h2, h3 { font-family: var(--serif); font-weight: 600; margin: 0; letter-spacing: -.2px; }
+  .muted { color: var(--muted); }
+  [hidden] { display: none !important; }
+
+  /* ---------- Kopf */
+  .top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+  .top h1 { font-size: 28px; line-height: 1.1; }
+  .top .sub { font-size: 14px; color: var(--muted); margin-top: 3px; font-weight: 600; }
+  .ring { position: relative; width: 58px; height: 58px; flex: none; }
+  .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .ring .bg { stroke: var(--blush); } .ring .fg { stroke: var(--rose); transition: stroke-dashoffset .5s ease; }
+  .ring span { position: absolute; inset: 0; display: grid; place-items: center; font-weight: 800; font-size: 13px; color: var(--rose-d); }
+
+  /* ---------- Tagesleiste */
+  .weeknav { display: flex; align-items: center; justify-content: space-between; margin: 4px 0 8px; }
+  .weeknav b { font-family: var(--serif); font-size: 17px; font-weight: 600; }
+  .navbtn { width: 36px; height: 36px; border-radius: 12px; border: 0; background: var(--card); box-shadow: var(--shadow); cursor: pointer; display: grid; place-items: center; }
+  .navbtn svg { width: 18px; height: 18px; }
+  .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-bottom: 14px; }
+  .day { border: 0; background: var(--card); border-radius: 16px; padding: 7px 0 6px; display: grid; justify-items: center; gap: 1px; cursor: pointer; box-shadow: var(--shadow); position: relative; }
+  .day small { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; }
+  .day b { font-size: 18px; font-weight: 800; }
+  .day i { width: 18px; height: 3px; border-radius: 3px; background: var(--blush); overflow: hidden; display: block; }
+  .day i::after { content: ""; display: block; height: 100%; width: var(--p, 0%); background: var(--sage); }
+  .day.today b { color: var(--rose-d); }
+  .day.today::before { content: ""; position: absolute; top: 4px; right: 6px; width: 5px; height: 5px; border-radius: 50%; background: var(--rose); }
+  .day[aria-pressed="true"] { background: linear-gradient(160deg, var(--rose), var(--rose-d)); color: #fff; }
+  .day[aria-pressed="true"] small { color: rgba(255,255,255,.85); }
+  .day[aria-pressed="true"] b { color: #fff; }
+  .day[aria-pressed="true"] i { background: rgba(255,255,255,.35); }
+  .day[aria-pressed="true"] i::after { background: #fff; }
+
+  /* ---------- Personen-Filter */
+  .people { display: flex; gap: 6px; overflow-x: auto; padding: 2px 2px 10px; margin: 0 -2px; scrollbar-width: none; }
+  .people::-webkit-scrollbar { display: none; }
+  .pchip { flex: none; display: flex; align-items: center; gap: 6px; border: 1.5px solid var(--line); background: var(--card); border-radius: 99px; padding: 5px 12px 5px 6px; font-size: 14px; font-weight: 700; cursor: pointer; }
+  .pchip .av { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; background: var(--c, var(--blush)); }
+  .pchip[aria-pressed="true"] { border-color: var(--c, var(--rose)); background: color-mix(in srgb, var(--c, var(--rose)) 22%, #fff); }
+
+  /* ---------- Abschnitte */
+  .section { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: 14px 14px 8px; margin-bottom: 14px; }
+  .shead { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .shead .ico { width: 34px; height: 34px; border-radius: 12px; display: grid; place-items: center; font-size: 18px; background: color-mix(in srgb, var(--k) 18%, #fff); }
+  .shead h2 { font-size: 19px; flex: 1; }
+  .shead .count { font-size: 13px; font-weight: 800; color: var(--muted); background: var(--cream2); border-radius: 99px; padding: 2px 9px; }
+  .shead .add { width: 32px; height: 32px; border-radius: 11px; border: 0; background: color-mix(in srgb, var(--k) 20%, #fff); color: var(--berry); font-size: 20px; font-weight: 700; cursor: pointer; line-height: 1; }
+  .empty { color: var(--muted); font-size: 14px; padding: 6px 2px 10px; }
+
+  .item { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; padding: 9px 2px; border-top: 1px solid var(--line); }
+  .item:first-of-type { border-top: 0; }
+  .check { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--blush2); background: #fff; cursor: pointer; display: grid; place-items: center; padding: 0; transition: transform .15s, background .2s, border-color .2s; }
+  .check svg { width: 15px; height: 15px; opacity: 0; transition: opacity .2s; }
+  .check:active { transform: scale(.88); }
+  .item.done .check { background: var(--sage); border-color: var(--sage); }
+  .item.done .check svg { opacity: 1; }
+  .item .body { min-width: 0; cursor: pointer; }
+  .item .t { font-weight: 700; font-size: 16px; display: flex; align-items: center; gap: 6px; }
+  .item .t .em { font-size: 17px; }
+  .item .t .txt { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .item.done .t .txt { text-decoration: line-through; text-decoration-color: var(--sage); color: var(--muted); }
+  .item .meta { font-size: 13px; color: var(--muted); font-weight: 600; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin-top: 1px; }
+  .item .time { font-size: 14px; font-weight: 800; color: var(--rose-d); text-align: right; line-height: 1.15; }
+  .item .time small { display: block; font-weight: 600; font-size: 12px; color: var(--muted); }
+  .dots { display: inline-flex; gap: 3px; }
+  .dots span { width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; font-size: 10px; background: var(--c); }
+  .rep { font-size: 12px; }
+
+  .meals { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding-bottom: 6px; }
+  .meal { border-radius: 16px; background: var(--cream); padding: 10px 11px; min-height: 74px; cursor: pointer; position: relative; border: 1.5px dashed transparent; }
+  .meal.emptyMeal { border-color: var(--line); background: transparent; }
+  .meals .meal:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  .meal small { font-size: 12px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; display: flex; align-items: center; gap: 4px; }
+  .meal b { display: block; font-size: 15px; margin-top: 3px; line-height: 1.25; }
+  .meal.emptyMeal b { color: var(--muted); font-weight: 600; }
+  .meal .check { position: absolute; right: 8px; top: 8px; width: 24px; height: 24px; }
+  .meal.done { background: var(--sage-l); }
+  .meal.done b { text-decoration: line-through; text-decoration-color: var(--sage); color: var(--muted); }
+  .meal.done .check { background: var(--sage); border-color: var(--sage); }
+  .meal.done .check svg { opacity: 1; }
+
+  /* ---------- Wochenuebersicht */
+  .wk { display: grid; gap: 10px; }
+  .wday { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: 12px 14px; cursor: pointer; border: 2px solid transparent; }
+  .wday.today { border-color: var(--blush2); }
+  .wday .h { display: flex; align-items: baseline; gap: 8px; }
+  .wday .h h3 { font-size: 18px; }
+  .wday .h .d { color: var(--muted); font-weight: 700; font-size: 14px; flex: 1; }
+  .wday .h .pc { font-weight: 800; font-size: 13px; color: var(--sage); }
+  .bar { height: 5px; border-radius: 5px; background: var(--blush); margin: 8px 0; overflow: hidden; }
+  .bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--sage), #a8d4b4); border-radius: 5px; transition: width .4s; }
+  .wrow { display: flex; gap: 6px; flex-wrap: wrap; font-size: 13px; }
+  .tag { display: inline-flex; align-items: center; gap: 4px; border-radius: 99px; padding: 3px 9px; font-weight: 700; background: color-mix(in srgb, var(--k) 15%, #fff); color: var(--text); max-width: 100%; }
+  .tag.done { opacity: .5; text-decoration: line-through; }
+  .tag span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .wmeals { font-size: 13px; color: var(--muted); font-weight: 600; margin-top: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .wact { display: flex; gap: 8px; margin-bottom: 12px; }
+  .pill { flex: 1; border: 0; border-radius: 14px; padding: 11px 10px; background: var(--card); box-shadow: var(--shadow); font-weight: 800; font-size: 14px; color: var(--berry); cursor: pointer; }
+
+  /* ---------- Essensplan */
+  .mtable { display: grid; gap: 10px; }
+  .mday { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: 12px; }
+  .mday h3 { font-size: 17px; margin-bottom: 8px; display: flex; gap: 8px; align-items: baseline; }
+  .mday h3 small { font-family: var(--sans); color: var(--muted); font-size: 13px; font-weight: 700; }
+  .mday .meals { grid-template-columns: repeat(2, 1fr); }
+  .ideas { display: flex; flex-wrap: wrap; gap: 6px; }
+  .idea { border: 1.5px solid var(--line); background: var(--card); border-radius: 99px; padding: 6px 12px; font-size: 14px; font-weight: 700; cursor: pointer; }
+
+  /* ---------- Familie */
+  .member { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); }
+  .member:first-of-type { border-top: 0; }
+  .member .av { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-size: 20px; background: var(--c); }
+  .member input { width: 100%; border: 0; background: transparent; font: 700 16px var(--sans); color: var(--text); padding: 6px 0; outline: none; border-bottom: 1.5px solid transparent; }
+  .member input:focus { border-bottom-color: var(--rose); }
+  .swatches { display: flex; gap: 4px; }
+  .sw { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px var(--line); cursor: pointer; padding: 0; }
+  .sw[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--rose-d); }
+  .btn { border: 0; border-radius: 14px; padding: 12px 16px; font-weight: 800; font-size: 15px; cursor: pointer; background: var(--blush); color: var(--berry); }
+  .btn.primary { background: linear-gradient(160deg, var(--rose), var(--rose-d)); color: #fff; box-shadow: 0 6px 16px rgba(196, 88, 122, .3); }
+  .btn.ghost { background: transparent; border: 1.5px solid var(--line); color: var(--text); }
+  .btn.danger { background: #fde4e4; color: #b03a3a; }
+  textarea.code { width: 100%; height: 70px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--cream); padding: 8px; font: 12px/1.3 ui-monospace, monospace; color: var(--text); }
+
+  /* ---------- Tab-Leiste und Plus */
+  .tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; padding: 8px 12px calc(8px + env(safe-area-inset-bottom)); background: rgba(255, 250, 247, .9); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-top: 1px solid var(--line); }
+  .tabs .in { max-width: 560px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr 64px 1fr 1fr; align-items: center; }
+  .tab { border: 0; background: transparent; display: grid; justify-items: center; gap: 2px; font-size: 11px; font-weight: 800; color: var(--muted); cursor: pointer; padding: 4px 0; }
+  .tab svg { width: 24px; height: 24px; }
+  .tab[aria-pressed="true"] { color: var(--rose-d); }
+  .fab { width: 56px; height: 56px; border-radius: 20px; border: 0; justify-self: center; margin-top: -26px; background: linear-gradient(160deg, var(--rose), var(--rose-d)); color: #fff; box-shadow: 0 8px 22px rgba(196, 88, 122, .45); cursor: pointer; display: grid; place-items: center; }
+  .fab svg { width: 28px; height: 28px; }
+
+  /* ---------- Formular-Sheet */
+  .scrim { position: fixed; inset: 0; background: rgba(75, 52, 62, .35); z-index: 20; opacity: 0; pointer-events: none; transition: opacity .25s; }
+  .scrim.open { opacity: 1; pointer-events: auto; }
+  .sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 21; max-width: 560px; margin: 0 auto; background: var(--card); border-radius: 26px 26px 0 0; padding: 10px 18px calc(18px + env(safe-area-inset-bottom)); max-height: 92dvh; overflow-y: auto; transform: translateY(105%); transition: transform .3s cubic-bezier(.2, .8, .2, 1); box-shadow: 0 -10px 40px rgba(75, 52, 62, .18); }
+  .sheet.open { transform: none; visibility: visible; transition: transform .3s cubic-bezier(.2, .8, .2, 1), visibility 0s; }
+  .sheet:not(.open) { visibility: hidden; transition: transform .3s cubic-bezier(.2, .8, .2, 1), visibility 0s .3s; }
+  .grab { width: 40px; height: 5px; border-radius: 5px; background: var(--line); margin: 0 auto 12px; }
+  .sheet h2 { font-size: 22px; margin-bottom: 12px; }
+  .seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; background: var(--cream2); border-radius: 14px; padding: 4px; margin-bottom: 14px; }
+  .seg button { border: 0; background: transparent; border-radius: 11px; padding: 9px 4px; font-weight: 800; font-size: 14px; color: var(--muted); cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: #fff; color: var(--berry); box-shadow: 0 2px 8px rgba(156, 61, 94, .12); }
+  .field { display: grid; gap: 6px; margin-bottom: 14px; }
+  .field > label, .flabel { font-size: 13px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; }
+  .inp { width: 100%; border: 1.5px solid var(--line); background: var(--cream); border-radius: 14px; padding: 12px 14px; font: 600 16px var(--sans); color: var(--text); outline: none; -webkit-appearance: none; appearance: none; min-height: 48px; }
+  .inp:focus { border-color: var(--rose); background: #fff; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .opts { display: flex; flex-wrap: wrap; gap: 6px; }
+  .opt { border: 1.5px solid var(--line); background: var(--card); border-radius: 99px; padding: 7px 12px; font-size: 14px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
+  .opt[aria-pressed="true"] { border-color: var(--rose); background: var(--blush); color: var(--berry); }
+  .opt .av { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; background: var(--c); }
+  .emojis { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+  .emojis::-webkit-scrollbar { display: none; }
+  .emo { flex: none; }
+  .emo { width: 40px; height: 40px; border-radius: 12px; border: 1.5px solid transparent; background: var(--cream); font-size: 20px; cursor: pointer; }
+  .emo[aria-pressed="true"] { border-color: var(--rose); background: var(--blush); }
+  .sheet .actions { display: grid; grid-template-columns: 1fr 2fr; gap: 10px; margin-top: 6px; }
+  .sugg { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin-top: 2px; }
+  .sugg::-webkit-scrollbar { display: none; }
+  .sugg button { flex: none; border: 0; background: var(--cream2); border-radius: 99px; padding: 6px 11px; font-size: 13px; font-weight: 700; cursor: pointer; }
+
+  .toast { position: fixed; left: 50%; bottom: calc(100px + env(safe-area-inset-bottom)); transform: translate(-50%, 20px); background: var(--text); color: #fff; padding: 10px 16px; border-radius: 14px; font-weight: 700; font-size: 14px; opacity: 0; transition: .25s; z-index: 30; pointer-events: none; white-space: nowrap; }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+  .confetti { position: fixed; inset: 0; pointer-events: none; z-index: 40; overflow: hidden; }
+  .confetti i { position: absolute; top: -10px; width: 8px; height: 12px; border-radius: 2px; animation: fall 1.6s ease-in forwards; }
+  @keyframes fall { to { transform: translateY(105vh) rotate(540deg); opacity: .6; } }
+  .update { position: fixed; top: max(10px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); z-index: 30; }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- ====== TAG ====== -->
+  <section data-view="day">
+    <div class="top">
+      <div><h1 id="dayTitle">Heute</h1><div class="sub" id="daySub"></div></div>
+      <div class="ring" title="Erledigt"><svg viewBox="0 0 36 36"><circle class="bg" cx="18" cy="18" r="15.5" fill="none" stroke-width="4"/><circle class="fg" id="ringFg" cx="18" cy="18" r="15.5" fill="none" stroke-width="4" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="97.4"/></svg><span id="ringTxt">0%</span></div>
+    </div>
+    <div class="weeknav">
+      <button class="navbtn" id="prevW" aria-label="Vorherige Woche"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <b id="weekLbl"></b>
+      <button class="navbtn" id="nextW" aria-label="Nächste Woche"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></button>
+    </div>
+    <div class="days" id="days"></div>
+    <div class="people" id="people"></div>
+
+    <div class="section" style="--k: var(--act)">
+      <div class="shead"><div class="ico">📅</div><h2>Termine &amp; Aktivitäten</h2><span class="count" id="cAct"></span><button class="add" data-add="act" aria-label="Aktivität hinzufügen">+</button></div>
+      <div id="listAct"></div>
+    </div>
+    <div class="section" style="--k: var(--meal)">
+      <div class="shead"><div class="ico">🍽️</div><h2>Essen</h2><span class="count" id="cMeal"></span><button class="add" data-add="meal" aria-label="Essen hinzufügen">+</button></div>
+      <div class="meals" id="listMeal"></div>
+    </div>
+    <div class="section" style="--k: var(--todo)">
+      <div class="shead"><div class="ico">✅</div><h2>To-Dos</h2><span class="count" id="cTodo"></span><button class="add" data-add="todo" aria-label="To-Do hinzufügen">+</button></div>
+      <div id="listTodo"></div>
+    </div>
+  </section>
+
+  <!-- ====== WOCHE ====== -->
+  <section data-view="week" hidden>
+    <div class="top"><div><h1>Wochenplan</h1><div class="sub" id="wkSub"></div></div></div>
+    <div class="weeknav">
+      <button class="navbtn" id="prevW2" aria-label="Vorherige Woche"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <b id="weekLbl2"></b>
+      <button class="navbtn" id="nextW2" aria-label="Nächste Woche"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></button>
+    </div>
+    <div class="wact"><button class="pill" id="copyWeek">Woche in die nächste kopieren</button><button class="pill" id="toToday">Zu heute</button></div>
+    <div class="wk" id="weekList"></div>
+  </section>
+
+  <!-- ====== ESSEN ====== -->
+  <section data-view="meals" hidden>
+    <div class="top"><div><h1>Essensplan</h1><div class="sub">Tippe auf eine Mahlzeit, um sie zu planen</div></div></div>
+    <div class="weeknav">
+      <button class="navbtn" id="prevW3" aria-label="Vorherige Woche"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <b id="weekLbl3"></b>
+      <button class="navbtn" id="nextW3" aria-label="Nächste Woche"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></button>
+    </div>
+    <div class="mtable" id="mealWeek"></div>
+  </section>
+
+  <!-- ====== FAMILIE ====== -->
+  <section data-view="family" hidden>
+    <div class="top"><div><h1>Familie</h1><div class="sub">Namen, Farben und Sicherung</div></div></div>
+    <div class="section"><div class="shead"><div class="ico" style="--k: var(--rose)">👨‍👩‍👧‍👦</div><h2>Unsere Familie</h2></div><div id="members"></div>
+      <button class="btn ghost" id="addMember" style="width:100%;margin:6px 0 8px">+ Person hinzufügen</button></div>
+    <div class="section"><div class="shead"><div class="ico" style="--k: var(--meal)">💡</div><h2>Lieblingsessen</h2></div>
+      <p class="muted" style="margin:0 0 8px;font-size:14px">Erscheinen als Vorschläge beim Essen planen. Tippen zum Entfernen.</p>
+      <div class="ideas" id="ideas"></div>
+      <div class="row2" style="grid-template-columns:1fr auto;margin:10px 0 8px"><input class="inp" id="ideaIn" placeholder="z. B. Kartoffelsuppe"><button class="btn" id="ideaAdd">Hinzufügen</button></div>
+    </div>
+    <div class="section"><div class="shead"><div class="ico" style="--k: var(--todo)">💾</div><h2>Sicherung</h2></div>
+      <p class="muted" style="margin:0 0 8px;font-size:14px">Alles wird nur auf diesem iPhone gespeichert. Mit dem Code kannst du den Plan sichern oder auf ein anderes Handy übertragen.</p>
+      <div style="display:grid;gap:8px;padding-bottom:8px">
+        <button class="btn" id="exportBtn">Code kopieren</button>
+        <textarea class="code" id="importCode" placeholder="Code hier einfügen …"></textarea>
+        <button class="btn ghost" id="importBtn">Code laden</button>
+        <button class="btn danger" id="cleanBtn">Alte Wochen aufräumen (älter als 4 Wochen)</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Tab-Leiste -->
+<nav class="tabs"><div class="in">
+  <button class="tab" data-tab="day" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>Tag</button>
+  <button class="tab" data-tab="week" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>Woche</button>
+  <button class="fab" id="fab" aria-label="Neuer Eintrag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+  <button class="tab" data-tab="meals" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 2v8a2 2 0 0 0 4 0V2M9 10v12M17 2c-2 2-3 5-3 8h3v12"/></svg>Essen</button>
+  <button class="tab" data-tab="family" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5"/><circle cx="17.5" cy="9.5" r="2.5"/><path d="M16.5 14.6c2.6.1 4.4 1.9 5 4.9"/></svg>Familie</button>
+</div></nav>
+
+<!-- Formular -->
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+  <div class="grab"></div>
+  <h2 id="sheetTitle">Neuer Eintrag</h2>
+  <div class="seg" id="typeSeg">
+    <button data-type="act">📅 Aktivität</button><button data-type="meal">🍽️ Essen</button><button data-type="todo">✅ To-Do</button>
+  </div>
+  <div class="field" id="fMealSlot"><span class="flabel">Mahlzeit</span><div class="opts" id="slotOpts"></div></div>
+  <div class="field"><label for="fTitle" id="fTitleLbl">Was?</label><input class="inp" id="fTitle" placeholder="z. B. Kinderturnen" autocomplete="off"><div class="sugg" id="sugg"></div></div>
+  <div class="field" id="fEmojiF"><span class="flabel">Symbol</span><div class="emojis" id="emojis"></div></div>
+  <div class="row2">
+    <div class="field"><label for="fDate">Tag</label><input class="inp" type="date" id="fDate"></div>
+    <div class="field" id="fRepF"><label for="fRep">Wiederholen</label>
+      <select class="inp" id="fRep"><option value="none">Einmalig</option><option value="daily">Täglich</option><option value="weekdays">Mo–Fr</option><option value="weekly">Jede Woche</option></select></div>
+  </div>
+  <div class="row2" id="fTimeF">
+    <div class="field"><label for="fTime">Von</label><input class="inp" type="time" id="fTime"></div>
+    <div class="field"><label for="fEnd">Bis</label><input class="inp" type="time" id="fEnd"></div>
+  </div>
+  <div class="field"><span class="flabel">Für wen?</span><div class="opts" id="whoOpts"></div></div>
+  <div class="field"><label for="fNote">Notiz</label><input class="inp" id="fNote" placeholder="optional, z. B. Turnbeutel mitnehmen" autocomplete="off"></div>
+  <div class="actions"><button class="btn ghost" id="delBtn">Löschen</button><button class="btn primary" id="saveBtn">Speichern</button></div>
+</div>
+
+<div class="toast" id="toast"></div>
+<button class="btn primary update" id="updateBtn" hidden>Neue Version – jetzt aktualisieren</button>
+
+<script>
+(() => {
+  "use strict";
+  const VERSION = 1;
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  const uid = () => Math.random().toString(36).slice(2, 10);
+
+  // ================================================================ Daten
+  const KEY = "familienplaner-v1";
+  const COLORS = ["#f6b6c8", "#f9d3a5", "#bfe0c8", "#c9d4f6", "#e3c6f0", "#f5e4a3", "#b9e3e6", "#f4c1b0"];
+  const freshState = () => ({
+    members: [
+      { id: "mama", name: "Mama", emoji: "👩", color: "#f6b6c8" },
+      { id: "papa", name: "Papa", emoji: "👨", color: "#c9d4f6" },
+      { id: "k1", name: "Kind 1", emoji: "👧", color: "#f9d3a5" },
+      { id: "k2", name: "Kind 2", emoji: "👦", color: "#bfe0c8" },
+      { id: "k3", name: "Kind 3", emoji: "👶", color: "#e3c6f0" },
+    ],
+    items: [], done: {}, skip: {},
+    ideas: ["Spaghetti Bolognese", "Pfannkuchen", "Fischstäbchen mit Kartoffeln", "Gemüsesuppe", "Pizza", "Müsli mit Obst", "Brot mit Aufschnitt", "Nudelauflauf", "Reis mit Hähnchen", "Joghurt mit Beeren"],
+    seeded: false,
+  });
+  let S = freshState();
+  try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(freshState(), JSON.parse(raw)); } catch (e) {}
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+
+  // ================================================================ Datum
+  const pad = n => String(n).padStart(2, "0");
+  const iso = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const parse = s => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
+  const addDays = (s, n) => { const d = parse(s); d.setDate(d.getDate() + n); return iso(d); };
+  const dow = s => (parse(s).getDay() + 6) % 7;            // 0 = Montag
+  const monday = s => addDays(s, -dow(s));
+  const today = () => iso(new Date());
+  const DAYS = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"];
+  const DSHORT = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
+  const MONTHS = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
+  const fmtLong = s => { const d = parse(s); return `${DAYS[dow(s)]}, ${d.getDate()}. ${MONTHS[d.getMonth()]}`; };
+  const fmtShort = s => { const d = parse(s); return `${d.getDate()}.${d.getMonth() + 1}.`; };
+  const weekNo = s => { const d = parse(s); d.setDate(d.getDate() + 3 - dow(s)); const y = new Date(d.getFullYear(), 0, 4); return 1 + Math.round(((d - y) / 864e5 - 3 + ((y.getDay() + 6) % 7)) / 7); };
+  const weekLabel = mon => `KW ${weekNo(mon)} · ${fmtShort(mon)} – ${fmtShort(addDays(mon, 6))}`;
+
+  // ================================================================ Logik
+  const MEAL_SLOTS = [["breakfast", "Frühstück", "🥣"], ["lunch", "Mittag", "🍝"], ["dinner", "Abendessen", "🥗"], ["snack", "Snack", "🍎"]];
+  const REP_TXT = { daily: "täglich", weekdays: "Mo–Fr", weekly: "wöchentlich" };
+  function occurs(it, d) {
+    if (S.skip[it.id + "|" + d]) return false;
+    if (d < it.date) return false;
+    if (it.repeat === "daily") return true;
+    if (it.repeat === "weekdays") return dow(d) < 5;
+    if (it.repeat === "weekly") return dow(d) === dow(it.date);
+    return d === it.date;
+  }
+  const isDone = (it, d) => !!S.done[it.id + "|" + d];
+  function itemsOn(d, type, filter) {
+    return S.items.filter(it => (!type || it.type === type) && occurs(it, d) && (!filter || !it.who.length || it.who.includes(filter) || it.who.includes("all")))
+      .sort((a, b) => (a.time || "99") < (b.time || "99") ? -1 : (a.time || "99") > (b.time || "99") ? 1 : a.title.localeCompare(b.title));
+  }
+  function progress(d) {
+    const all = itemsOn(d); if (!all.length) return null;
+    return all.filter(it => isDone(it, d)).length / all.length;
+  }
+
+  // ================================================================ Zustand der Ansicht
+  let selDay = today(), view = "day", personFilter = null;
+
+  // ================================================================ Bausteine
+  const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  const memberOf = id => S.members.find(m => m.id === id);
+  function dotsHtml(who) {
+    if (!who.length) return "";
+    return `<span class="dots">${who.map(id => { const m = memberOf(id); return m ? `<span style="--c:${m.color}" title="${esc(m.name)}">${m.emoji}</span>` : ""; }).join("")}</span>`;
+  }
+  function namesTxt(who) { return who.map(id => (memberOf(id) || {}).name).filter(Boolean).join(", "); }
+
+  function toggleDone(it, d, el) {
+    const k = it.id + "|" + d;
+    if (S.done[k]) delete S.done[k]; else { S.done[k] = 1; if (navigator.vibrate) navigator.vibrate(12); }
+    save();
+    if (S.done[k] && progress(d) === 1) { confetti(); toast("Alles erledigt für heute! 🎉"); }
+    renderAll();
+  }
+
+  // ================================================================ Tagesansicht
+  function renderDay() {
+    const t = today();
+    $("dayTitle").textContent = selDay === t ? "Heute" : selDay === addDays(t, 1) ? "Morgen" : selDay === addDays(t, -1) ? "Gestern" : DAYS[dow(selDay)];
+    $("daySub").textContent = fmtLong(selDay) + (selDay === t ? " · " + greeting() : "");
+    const p = progress(selDay) || 0;
+    $("ringFg").setAttribute("stroke-dashoffset", (97.4 * (1 - p)).toFixed(1));
+    $("ringTxt").textContent = Math.round(p * 100) + "%";
+    // Tage der Woche
+    const mon = monday(selDay);
+    $("weekLbl").textContent = weekLabel(mon);
+    const days = $("days"); days.innerHTML = "";
+    for (let i = 0; i < 7; i++) {
+      const d = addDays(mon, i), pr = progress(d);
+      const b = document.createElement("button");
+      b.className = "day" + (d === t ? " today" : ""); b.setAttribute("aria-pressed", String(d === selDay));
+      b.innerHTML = `<small>${DSHORT[i]}</small><b>${parse(d).getDate()}</b><i style="--p:${pr == null ? 0 : Math.round(pr * 100)}%"></i>`;
+      b.onclick = () => { selDay = d; renderDay(); };
+      days.appendChild(b);
+    }
+    // Personen-Filter
+    const pp = $("people"); pp.innerHTML = "";
+    const chip = (id, label, emoji, color) => {
+      const b = document.createElement("button"); b.className = "pchip"; b.style.setProperty("--c", color);
+      b.setAttribute("aria-pressed", String(personFilter === id));
+      b.innerHTML = `<span class="av">${emoji}</span>${esc(label)}`;
+      b.onclick = () => { personFilter = personFilter === id ? null : id; renderDay(); };
+      pp.appendChild(b);
+    };
+    chip(null, "Alle", "🏡", "#f3cbd5");
+    S.members.forEach(m => chip(m.id, m.name, m.emoji, m.color));
+
+    // Aktivitaeten und To-Dos
+    for (const [type, box, cnt, emptyTxt] of [["act", "listAct", "cAct", "Noch keine Termine. Tippe auf +, um etwas zu planen."], ["todo", "listTodo", "cTodo", "Keine To-Dos. Genieß den Tag! ☕"]]) {
+      const list = itemsOn(selDay, type, personFilter), el = $(box);
+      $(cnt).textContent = list.length ? `${list.filter(it => isDone(it, selDay)).length}/${list.length}` : "0";
+      el.innerHTML = list.length ? "" : `<div class="empty">${emptyTxt}</div>`;
+      for (const it of list) el.appendChild(itemRow(it, selDay));
+    }
+    // Essen
+    const meals = itemsOn(selDay, "meal", personFilter), mb = $("listMeal");
+    $("cMeal").textContent = meals.length ? `${meals.filter(it => isDone(it, selDay)).length}/${meals.length}` : "0";
+    mb.innerHTML = "";
+    for (const [slot, name, em] of MEAL_SLOTS) {
+      const here = meals.filter(m => m.slot === slot);
+      if (!here.length) {
+        if (slot === "snack") continue;
+        const c = document.createElement("div"); c.className = "meal emptyMeal";
+        c.innerHTML = `<small>${em} ${name}</small><b>+ planen</b>`;
+        c.onclick = () => openSheet({ type: "meal", slot, date: selDay });
+        mb.appendChild(c); continue;
+      }
+      for (const it of here) mb.appendChild(mealCard(it, selDay, name, em));
+    }
+  }
+  function greeting() { const h = new Date().getHours(); return h < 11 ? "Guten Morgen ☀️" : h < 17 ? "Schönen Tag 🌸" : "Schönen Abend 🌙"; }
+
+  function itemRow(it, d) {
+    const row = document.createElement("div");
+    row.className = "item" + (isDone(it, d) ? " done" : "");
+    const c = document.createElement("button"); c.className = "check"; c.innerHTML = CHECK; c.setAttribute("aria-label", "Erledigt");
+    c.onclick = () => toggleDone(it, d, row);
+    const body = document.createElement("div"); body.className = "body";
+    const meta = [];
+    if (it.who.length) meta.push(dotsHtml(it.who) + `<span>${esc(namesTxt(it.who))}</span>`);
+    if (it.repeat !== "none") meta.push(`<span class="rep">🔁 ${REP_TXT[it.repeat]}</span>`);
+    if (it.note) meta.push(`<span>📝 ${esc(it.note)}</span>`);
+    body.innerHTML = `<div class="t">${it.emoji ? `<span class="em">${it.emoji}</span>` : ""}<span class="txt">${esc(it.title)}</span></div>${meta.length ? `<div class="meta">${meta.join("")}</div>` : ""}`;
+    body.onclick = () => openSheet(it, d);
+    const tm = document.createElement("div"); tm.className = "time";
+    tm.innerHTML = it.time ? `${it.time}${it.end ? `<small>bis ${it.end}</small>` : ""}` : "";
+    row.append(c, body, tm);
+    return row;
+  }
+  function mealCard(it, d, name, em) {
+    const c = document.createElement("div"); c.className = "meal" + (isDone(it, d) ? " done" : "");
+    c.innerHTML = `<small>${em} ${name}</small><b>${esc(it.title)}</b>${it.who.length ? `<div style="margin-top:4px">${dotsHtml(it.who)}</div>` : ""}`;
+    const ch = document.createElement("button"); ch.className = "check"; ch.innerHTML = CHECK; ch.setAttribute("aria-label", "Zubereitet");
+    ch.onclick = e => { e.stopPropagation(); toggleDone(it, d); };
+    c.appendChild(ch);
+    c.onclick = () => openSheet(it, d);
+    return c;
+  }
+
+  // ================================================================ Wochenansicht
+  function renderWeek() {
+    const mon = monday(selDay), t = today();
+    $("weekLbl2").textContent = weekLabel(mon);
+    let total = 0, done = 0;
+    const box = $("weekList"); box.innerHTML = "";
+    for (let i = 0; i < 7; i++) {
+      const d = addDays(mon, i), all = itemsOn(d);
+      const dn = all.filter(it => isDone(it, d)).length; total += all.length; done += dn;
+      const el = document.createElement("div"); el.className = "wday" + (d === t ? " today" : "");
+      const acts = all.filter(it => it.type !== "meal");
+      const meals = all.filter(it => it.type === "meal");
+      const tags = acts.slice(0, 6).map(it => `<span class="tag${isDone(it, d) ? " done" : ""}" style="--k:${it.type === "act" ? "var(--act)" : "var(--todo)"}">${it.emoji || (it.type === "todo" ? "✅" : "📅")}<span>${it.time ? it.time + " " : ""}${esc(it.title)}</span></span>`).join("");
+      el.innerHTML = `<div class="h"><h3>${DAYS[i]}</h3><span class="d">${fmtShort(d)}${d === t ? " · heute" : ""}</span><span class="pc">${all.length ? Math.round(dn / all.length * 100) + " %" : ""}</span></div>
+        <div class="bar"><i style="width:${all.length ? dn / all.length * 100 : 0}%"></i></div>
+        <div class="wrow">${tags || '<span class="muted" style="font-size:13px">Noch nichts geplant</span>'}${acts.length > 6 ? `<span class="tag" style="--k:var(--muted)">+${acts.length - 6} mehr</span>` : ""}</div>
+        ${meals.length ? `<div class="wmeals">🍽️ ${meals.map(m => esc(m.title)).join(" · ")}</div>` : ""}`;
+      el.onclick = () => { selDay = d; setView("day"); };
+      box.appendChild(el);
+    }
+    $("wkSub").textContent = total ? `${done} von ${total} erledigt` : "Plane die Woche ganz in Ruhe";
+  }
+
+  // ================================================================ Essensplan
+  function renderMeals() {
+    const mon = monday(selDay), t = today();
+    $("weekLbl3").textContent = weekLabel(mon);
+    const box = $("mealWeek"); box.innerHTML = "";
+    for (let i = 0; i < 7; i++) {
+      const d = addDays(mon, i), meals = itemsOn(d, "meal");
+      const el = document.createElement("div"); el.className = "mday";
+      el.innerHTML = `<h3>${DAYS[i]} <small>${fmtShort(d)}${d === t ? " · heute" : ""}</small></h3>`;
+      const g = document.createElement("div"); g.className = "meals";
+      for (const [slot, name, em] of MEAL_SLOTS.slice(0, 3)) {
+        const here = meals.filter(m => m.slot === slot);
+        if (!here.length) { const c = document.createElement("div"); c.className = "meal emptyMeal"; c.innerHTML = `<small>${em} ${name}</small><b>+ planen</b>`; c.onclick = () => openSheet({ type: "meal", slot, date: d }); g.appendChild(c); }
+        else here.forEach(it => g.appendChild(mealCard(it, d, name, em)));
+      }
+      meals.filter(m => m.slot === "snack").forEach(it => g.appendChild(mealCard(it, d, "Snack", "🍎")));
+      el.appendChild(g); box.appendChild(el);
+    }
+  }
+
+  // ================================================================ Familie
+  function renderFamily() {
+    const box = $("members"); box.innerHTML = "";
+    const EMO = ["👩", "👨", "👧", "👦", "👶", "🧒", "👵", "👴", "🐶", "🐱"];
+    S.members.forEach((m, idx) => {
+      const r = document.createElement("div"); r.className = "member";
+      const av = document.createElement("button"); av.className = "av"; av.style.setProperty("--c", m.color); av.style.border = "0"; av.style.cursor = "pointer"; av.textContent = m.emoji; av.title = "Symbol ändern";
+      av.onclick = () => { m.emoji = EMO[(EMO.indexOf(m.emoji) + 1) % EMO.length]; save(); renderAll(); };
+      const mid = document.createElement("div");
+      const inp = document.createElement("input"); inp.value = m.name; inp.setAttribute("aria-label", "Name");
+      inp.onchange = () => { m.name = inp.value.trim() || m.name; save(); renderAll(); };
+      const sw = document.createElement("div"); sw.className = "swatches";
+      COLORS.forEach(c => { const s = document.createElement("button"); s.className = "sw"; s.style.background = c; s.setAttribute("aria-pressed", String(c === m.color)); s.setAttribute("aria-label", "Farbe"); s.onclick = () => { m.color = c; save(); renderAll(); }; sw.appendChild(s); });
+      mid.append(inp, sw);
+      const del = document.createElement("button"); del.className = "navbtn"; del.innerHTML = "✕"; del.title = "Entfernen";
+      del.onclick = () => { if (!confirm(`${m.name} entfernen?`)) return; S.members.splice(idx, 1); S.items.forEach(it => it.who = it.who.filter(w => w !== m.id)); save(); renderAll(); };
+      r.append(av, mid, del); box.appendChild(r);
+    });
+    const ib = $("ideas"); ib.innerHTML = "";
+    S.ideas.forEach((x, i) => { const b = document.createElement("button"); b.className = "idea"; b.textContent = x + "  ✕"; b.onclick = () => { S.ideas.splice(i, 1); save(); renderFamily(); }; ib.appendChild(b); });
+  }
+
+  // ================================================================ Formular
+  const EMOJI = { act: ["📅", "🏫", "⚽", "🩰", "🏊", "🎨", "🎵", "🩺", "🛒", "🎂", "🚗", "🛝", "📚", "😴", "🛁", "❤️"], todo: ["✅", "🧺", "🧹", "📞", "💊", "📦", "💌", "🧾", "🪴", "🍼"] };
+  const SUGG = {
+    act: ["Kita bringen", "Kita abholen", "Schule", "Mittagsschlaf", "Spielplatz", "Kinderturnen", "Schwimmkurs", "Kinderarzt", "Einkaufen", "Baden", "Vorlesen", "Ins Bett bringen", "Musikschule", "Oma & Opa"],
+    todo: ["Wäsche waschen", "Spülmaschine ausräumen", "Brotdosen packen", "Arzttermin machen", "Geschenk besorgen", "Rechnung bezahlen", "Pausenbrot", "Windeln kaufen", "Hausaufgaben checken"],
+  };
+  let edit = null, editDate = null, form = null;
+  function openSheet(it, d) {
+    const isNew = !it.id;
+    edit = isNew ? null : it; editDate = d || it.date || selDay;
+    form = { type: it.type || "act", title: it.title || "", emoji: it.emoji || "", date: isNew ? (it.date || selDay) : it.date, repeat: it.repeat || "none", time: it.time || "", end: it.end || "", who: (it.who || []).slice(), note: it.note || "", slot: it.slot || "lunch" };
+    $("sheetTitle").textContent = isNew ? "Neuer Eintrag" : "Bearbeiten";
+    $("delBtn").textContent = isNew ? "Abbrechen" : "Löschen";
+    $("fTitle").value = form.title; $("fDate").value = form.date; $("fRep").value = form.repeat; $("fTime").value = form.time; $("fEnd").value = form.end; $("fNote").value = form.note;
+    syncForm();
+    $("scrim").classList.add("open"); $("sheet").classList.add("open");
+    if (isNew) setTimeout(() => $("fTitle").focus(), 320);
+  }
+  function closeSheet() { $("scrim").classList.remove("open"); $("sheet").classList.remove("open"); document.activeElement && document.activeElement.blur(); }
+  function syncForm() {
+    document.querySelectorAll("#typeSeg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.type === form.type)));
+    const meal = form.type === "meal";
+    $("fMealSlot").hidden = !meal; $("fEmojiF").hidden = meal; $("fTimeF").hidden = form.type !== "act";
+    $("fTitleLbl").textContent = meal ? "Was gibt es?" : form.type === "todo" ? "Was ist zu tun?" : "Was steht an?";
+    $("fTitle").placeholder = meal ? "z. B. Nudeln mit Tomatensoße" : form.type === "todo" ? "z. B. Brotdosen packen" : "z. B. Kinderturnen";
+    const so = $("slotOpts"); so.innerHTML = "";
+    MEAL_SLOTS.forEach(([id, name, em]) => { const b = document.createElement("button"); b.className = "opt"; b.type = "button"; b.textContent = em + " " + name; b.setAttribute("aria-pressed", String(form.slot === id)); b.onclick = () => { form.slot = id; syncForm(); }; so.appendChild(b); });
+    const eb = $("emojis"); eb.innerHTML = "";
+    (EMOJI[form.type] || []).forEach(e => { const b = document.createElement("button"); b.className = "emo"; b.type = "button"; b.textContent = e; b.setAttribute("aria-pressed", String(form.emoji === e)); b.onclick = () => { form.emoji = form.emoji === e ? "" : e; syncForm(); }; eb.appendChild(b); });
+    const wo = $("whoOpts"); wo.innerHTML = "";
+    S.members.forEach(m => { const b = document.createElement("button"); b.className = "opt"; b.type = "button"; b.style.setProperty("--c", m.color); b.innerHTML = `<span class="av">${m.emoji}</span>${esc(m.name)}`; b.setAttribute("aria-pressed", String(form.who.includes(m.id))); b.onclick = () => { form.who = form.who.includes(m.id) ? form.who.filter(x => x !== m.id) : form.who.concat(m.id); syncForm(); }; wo.appendChild(b); });
+    const sg = $("sugg"); sg.innerHTML = "";
+    (meal ? S.ideas : SUGG[form.type]).forEach(x => { const b = document.createElement("button"); b.type = "button"; b.textContent = x; b.onclick = () => { $("fTitle").value = x; form.title = x; }; sg.appendChild(b); });
+  }
+  document.querySelectorAll("#typeSeg button").forEach(b => b.onclick = () => { form.type = b.dataset.type; syncForm(); });
+  $("fTitle").oninput = e => form.title = e.target.value;
+  $("fDate").onchange = e => form.date = e.target.value || form.date;
+  $("fRep").onchange = e => form.repeat = e.target.value;
+  $("fTime").onchange = e => form.time = e.target.value;
+  $("fEnd").onchange = e => form.end = e.target.value;
+  $("fNote").oninput = e => form.note = e.target.value;
+  $("scrim").onclick = closeSheet;
+  $("saveBtn").onclick = () => {
+    form.title = $("fTitle").value.trim();
+    if (!form.title) { $("fTitle").focus(); toast("Bitte gib einen Titel ein"); return; }
+    const data = { type: form.type, title: form.title, emoji: form.type === "meal" ? "" : form.emoji, date: form.date, repeat: form.repeat, time: form.type === "act" ? form.time : "", end: form.type === "act" ? form.end : "", who: form.who, note: form.note.trim(), slot: form.type === "meal" ? form.slot : undefined };
+    if (edit) Object.assign(edit, data); else S.items.push(Object.assign({ id: uid() }, data));
+    if (form.type === "meal" && !S.ideas.includes(form.title)) S.ideas.unshift(form.title), S.ideas = S.ideas.slice(0, 40);
+    save(); closeSheet(); renderAll(); toast(edit ? "Gespeichert" : "Eingeplant ✨");
+  };
+  $("delBtn").onclick = () => {
+    if (!edit) { closeSheet(); return; }
+    if (edit.repeat !== "none") {
+      const only = confirm("Nur an diesem Tag löschen?\n\nOK = nur dieser Tag\nAbbrechen = alle Wiederholungen löschen");
+      if (only) { S.skip[edit.id + "|" + editDate] = 1; save(); closeSheet(); renderAll(); toast("Für diesen Tag gelöscht"); return; }
+    }
+    S.items = S.items.filter(x => x !== edit); save(); closeSheet(); renderAll(); toast("Gelöscht");
+  };
+  $("fab").onclick = () => openSheet({ type: view === "meals" ? "meal" : "act", date: selDay });
+  document.querySelectorAll("[data-add]").forEach(b => b.onclick = () => openSheet({ type: b.dataset.add, date: selDay, who: personFilter ? [personFilter] : [] }));
+
+  // ================================================================ Navigation
+  function setView(v) {
+    view = v;
+    document.querySelectorAll("[data-view]").forEach(s => s.hidden = s.dataset.view !== v);
+    document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-pressed", String(t.dataset.tab === v)));
+    renderAll(); window.scrollTo(0, 0);
+  }
+  document.querySelectorAll(".tab").forEach(t => t.onclick = () => setView(t.dataset.tab));
+  const shiftWeek = n => { selDay = addDays(selDay, 7 * n); renderAll(); };
+  [["prevW", -1], ["nextW", 1], ["prevW2", -1], ["nextW2", 1], ["prevW3", -1], ["nextW3", 1]].forEach(([id, n]) => $(id).onclick = () => shiftWeek(n));
+  $("toToday").onclick = () => { selDay = today(); setView("day"); };
+  $("copyWeek").onclick = () => {
+    const mon = monday(selDay), next = addDays(mon, 7);
+    const one = S.items.filter(it => it.repeat === "none" && it.date >= mon && it.date < next);
+    if (!one.length) { toast("Diese Woche hat keine einmaligen Einträge"); return; }
+    if (!confirm(`${one.length} Einträge in die Woche ab ${fmtShort(next)} kopieren?\n(Wiederholende Einträge laufen sowieso weiter.)`)) return;
+    one.forEach(it => S.items.push(Object.assign({}, it, { id: uid(), date: addDays(it.date, 7), who: it.who.slice() })));
+    save(); selDay = addDays(selDay, 7); renderAll(); toast("Woche kopiert 📋");
+  };
+
+  // ================================================================ Familie-Aktionen
+  $("addMember").onclick = () => { const c = COLORS[S.members.length % COLORS.length]; S.members.push({ id: uid(), name: "Neue Person", emoji: "🧒", color: c }); save(); renderAll(); };
+  $("ideaAdd").onclick = () => { const v = $("ideaIn").value.trim(); if (!v) return; if (!S.ideas.includes(v)) S.ideas.unshift(v); $("ideaIn").value = ""; save(); renderFamily(); };
+  $("exportBtn").onclick = async () => {
+    const code = btoa(unescape(encodeURIComponent(JSON.stringify(S))));
+    try { await navigator.clipboard.writeText(code); toast("Code kopiert 📋"); } catch (e) { $("importCode").value = code; $("importCode").select(); toast("Code markiert, bitte kopieren"); }
+  };
+  $("importBtn").onclick = () => {
+    const c = $("importCode").value.trim(); if (!c) { toast("Erst einen Code einfügen"); return; }
+    let data; try { data = JSON.parse(decodeURIComponent(escape(atob(c)))); } catch (e) { toast("Der Code ist ungültig"); return; }
+    if (!confirm("Den aktuellen Plan durch den Code ersetzen?")) return;
+    S = Object.assign(freshState(), data); save(); $("importCode").value = ""; renderAll(); toast("Plan geladen ✨");
+  };
+  $("cleanBtn").onclick = () => {
+    const cut = addDays(monday(today()), -28);
+    const before = S.items.length;
+    S.items = S.items.filter(it => it.repeat !== "none" || it.date >= cut);
+    for (const k of Object.keys(S.done)) if (k.split("|")[1] < cut) delete S.done[k];
+    for (const k of Object.keys(S.skip)) if (k.split("|")[1] < cut) delete S.skip[k];
+    save(); renderAll(); toast(`${before - S.items.length} alte Einträge entfernt`);
+  };
+
+  // ================================================================ Kleinigkeiten
+  let toastT = 0;
+  function toast(t) { const e = $("toast"); e.textContent = t; e.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(() => e.classList.remove("show"), 1900); }
+  function confetti() {
+    const box = document.createElement("div"); box.className = "confetti";
+    const cols = ["#e58aa3", "#f5c6a5", "#8dbf9e", "#f3cbd5", "#e8b46a", "#c9d4f6"];
+    for (let i = 0; i < 46; i++) { const p = document.createElement("i"); p.style.left = Math.random() * 100 + "%"; p.style.background = cols[i % cols.length]; p.style.animationDelay = Math.random() * .4 + "s"; p.style.animationDuration = 1.2 + Math.random() * .9 + "s"; box.appendChild(p); }
+    document.body.appendChild(box); setTimeout(() => box.remove(), 2600);
+  }
+  function renderAll() { if (view === "day") renderDay(); else if (view === "week") renderWeek(); else if (view === "meals") renderMeals(); else renderFamily(); }
+
+  // Beispiel-Eintraege beim allerersten Start, damit man sieht, wie es aussieht
+  if (!S.seeded) {
+    const t = today(), mon = monday(t);
+    const add = o => S.items.push(Object.assign({ id: uid(), emoji: "", repeat: "none", time: "", end: "", who: [], note: "", date: t }, o));
+    add({ type: "act", title: "Kita bringen", emoji: "🏫", time: "07:45", repeat: "weekdays", date: mon, who: ["k1", "k2"] });
+    add({ type: "act", title: "Kita abholen", emoji: "🚗", time: "15:00", repeat: "weekdays", date: mon, who: ["k1", "k2"] });
+    add({ type: "act", title: "Mittagsschlaf", emoji: "😴", time: "12:30", end: "14:00", repeat: "daily", date: mon, who: ["k3"] });
+    add({ type: "act", title: "Kinderturnen", emoji: "🤸", time: "16:30", end: "17:30", repeat: "weekly", date: addDays(mon, 2), who: ["k1"], note: "Turnbeutel mitnehmen" });
+    add({ type: "act", title: "Baden & Vorlesen", emoji: "🛁", time: "18:30", repeat: "daily", date: mon, who: ["k1", "k2", "k3"] });
+    add({ type: "meal", slot: "breakfast", title: "Müsli mit Obst", date: t });
+    add({ type: "meal", slot: "lunch", title: "Nudeln mit Tomatensoße", date: t });
+    add({ type: "meal", slot: "dinner", title: "Brot mit Aufschnitt", date: t });
+    add({ type: "todo", title: "Brotdosen packen", emoji: "🍱", repeat: "weekdays", date: mon });
+    add({ type: "todo", title: "Wäsche waschen", emoji: "🧺", date: t });
+    S.seeded = true; save();
+  }
+
+  setView("day");
+  // Datum wechselt um Mitternacht automatisch
+  let lastToday = today();
+  setInterval(() => { if (today() !== lastToday) { if (selDay === lastToday) selDay = today(); lastToday = today(); renderAll(); } }, 60000);
+
+  // Offline-Speicher und Update-Hinweis
+  if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
+  (async () => { try { const r = await fetch("version.json?t=" + Date.now(), { cache: "no-store" }); const j = await r.json(); if (Number(j.version) > VERSION) $("updateBtn").hidden = false; } catch (e) {} })();
+  $("updateBtn").onclick = async () => { try { const regs = await navigator.serviceWorker.getRegistrations(); await Promise.all(regs.map(r => r.unregister())); const ks = await caches.keys(); await Promise.all(ks.map(k => caches.delete(k))); } catch (e) {} location.reload(); };
+})();
+</script>
+</body>
+</html>
