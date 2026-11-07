@@ -130,6 +130,33 @@
   .wact { display: flex; gap: 8px; margin-bottom: 12px; }
   .pill { flex: 1; border: 0; border-radius: 14px; padding: 11px 10px; background: var(--card); box-shadow: var(--shadow); font-weight: 800; font-size: 14px; color: var(--berry); cursor: pointer; }
 
+  /* ---------- Monatsuebersicht */
+  .mseg { margin-bottom: 10px; }
+  .cal { padding: 12px 10px 10px; }
+  .cal-head, .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .cal-head span { text-align: center; font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; padding-bottom: 4px; }
+  .cell { border: 0; background: var(--cream); border-radius: 12px; min-height: 58px; padding: 5px 2px 4px; display: grid; grid-template-rows: auto 1fr auto; justify-items: center; gap: 2px; cursor: pointer; position: relative; }
+  .cell.out { opacity: .38; }
+  .cell b { font-size: 15px; font-weight: 800; line-height: 1; width: 26px; height: 26px; display: grid; place-items: center; border-radius: 50%; }
+  .cell.today b { background: var(--rose); color: #fff; }
+  .cell.sel { box-shadow: inset 0 0 0 2px var(--rose-d); background: var(--blush); }
+  .cell.alldone { background: var(--sage-l); }
+  .cell.weekend:not(.sel):not(.alldone) { background: var(--cream2); }
+  .cell .pips { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px; max-width: 34px; align-content: flex-start; }
+  .cell .pips i { width: 6px; height: 6px; border-radius: 50%; display: block; }
+  .cell .n { font-size: 10px; font-weight: 800; color: var(--muted); }
+  .legend { display: flex; flex-wrap: wrap; gap: 4px 12px; justify-content: center; margin-top: 10px; font-size: 12px; font-weight: 700; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 4px; }
+  .legend i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .mstats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+  .stat { background: var(--card); border-radius: 16px; box-shadow: var(--shadow); padding: 10px; text-align: center; }
+  .stat b { display: block; font-family: var(--serif); font-size: 22px; color: var(--rose-d); }
+  .stat span { font-size: 12px; font-weight: 700; color: var(--muted); }
+  .agenda .ai { display: grid; grid-template-columns: 46px 1fr; gap: 8px; padding: 7px 0; border-top: 1px solid var(--line); font-size: 15px; }
+  .agenda .ai:first-of-type { border-top: 0; }
+  .agenda .ai .tm { font-weight: 800; color: var(--rose-d); font-size: 13px; padding-top: 1px; }
+  .agenda .ai.done .tx { text-decoration: line-through; color: var(--muted); }
+
   /* ---------- Essensplan */
   .mtable { display: grid; gap: 10px; }
   .mday { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: 12px; }
@@ -233,7 +260,9 @@
 
   <!-- ====== WOCHE ====== -->
   <section data-view="week" hidden>
-    <div class="top"><div><h1>Wochenplan</h1><div class="sub" id="wkSub"></div></div></div>
+    <div class="top"><div><h1 id="wkTitle">Wochenplan</h1><div class="sub" id="wkSub"></div></div></div>
+    <div class="seg mseg" id="wkSeg" style="grid-template-columns:1fr 1fr"><button data-mode="week">Woche</button><button data-mode="month">Monat</button></div>
+    <div id="weekMode">
     <div class="weeknav">
       <button class="navbtn" id="prevW2" aria-label="Vorherige Woche"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></button>
       <b id="weekLbl2"></b>
@@ -241,6 +270,21 @@
     </div>
     <div class="wact"><button class="pill" id="copyWeek">Woche in die nächste kopieren</button><button class="pill" id="toToday">Zu heute</button></div>
     <div class="wk" id="weekList"></div>
+    </div>
+    <div id="monthMode" hidden>
+      <div class="weeknav">
+        <button class="navbtn" id="prevM" aria-label="Vorheriger Monat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <b id="monthLbl"></b>
+        <button class="navbtn" id="nextM" aria-label="Nächster Monat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></button>
+      </div>
+      <div class="section cal">
+        <div class="cal-head" id="calHead"></div>
+        <div class="cal-grid" id="calGrid"></div>
+        <div class="legend"><span><i style="background:var(--act)"></i>Termine</span><span><i style="background:var(--meal)"></i>Essen</span><span><i style="background:var(--todo)"></i>To-Dos</span><span><i style="background:var(--sage)"></i>alles erledigt</span></div>
+      </div>
+      <div class="mstats" id="mStats"></div>
+      <div class="section" id="calDay"></div>
+    </div>
   </section>
 
   <!-- ====== ESSEN ====== -->
@@ -279,7 +323,7 @@
 <!-- Tab-Leiste -->
 <nav class="tabs"><div class="in">
   <button class="tab" data-tab="day" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>Tag</button>
-  <button class="tab" data-tab="week" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>Woche</button>
+  <button class="tab" data-tab="week" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>Kalender</button>
   <button class="fab" id="fab" aria-label="Neuer Eintrag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
   <button class="tab" data-tab="meals" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 2v8a2 2 0 0 0 4 0V2M9 10v12M17 2c-2 2-3 5-3 8h3v12"/></svg>Essen</button>
   <button class="tab" data-tab="family" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5"/><circle cx="17.5" cy="9.5" r="2.5"/><path d="M16.5 14.6c2.6.1 4.4 1.9 5 4.9"/></svg>Familie</button>
@@ -316,7 +360,7 @@
 <script>
 (() => {
   "use strict";
-  const VERSION = 1;
+  const VERSION = 2;
   const $ = id => document.getElementById(id);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
   const uid = () => Math.random().toString(36).slice(2, 10);
@@ -482,7 +526,55 @@
   }
 
   // ================================================================ Wochenansicht
+  let weekMode = "week", selMonthDay = null;
+  document.querySelectorAll("#wkSeg button").forEach(b => b.onclick = () => { weekMode = b.dataset.mode; renderWeek(); });
+  function renderMonth() {
+    const t = today(), ref = parse(selDay);
+    const y = ref.getFullYear(), mo = ref.getMonth();
+    const first = iso(new Date(y, mo, 1)), last = iso(new Date(y, mo + 1, 0));
+    if (!selMonthDay || selMonthDay < first || selMonthDay > last) selMonthDay = (t >= first && t <= last) ? t : first;
+    $("monthLbl").textContent = `${MONTHS[mo]} ${y}`;
+    $("calHead").innerHTML = DSHORT.map(d => `<span>${d}</span>`).join("");
+    const grid = $("calGrid"); grid.innerHTML = "";
+    let start = monday(first); const end = addDays(monday(last), 6);
+    let nAct = 0, nMeal = 0, nTodo = 0, nAll = 0, nDone = 0;
+    for (let d = start; d <= end; d = addDays(d, 1)) {
+      const inMonth = d >= first && d <= last, all = itemsOn(d);
+      const dn = all.filter(it => isDone(it, d)).length;
+      if (inMonth) { nAll += all.length; nDone += dn; all.forEach(it => it.type === "act" ? nAct++ : it.type === "meal" ? nMeal++ : nTodo++); }
+      const c = document.createElement("button");
+      c.className = "cell" + (inMonth ? "" : " out") + (d === t ? " today" : "") + (d === selMonthDay ? " sel" : "") + (dow(d) >= 5 ? " weekend" : "") + (all.length && dn === all.length ? " alldone" : "");
+      const pips = all.slice(0, 8).map(it => `<i style="background:${isDone(it, d) ? "var(--sage)" : it.type === "act" ? "var(--act)" : it.type === "meal" ? "var(--meal)" : "var(--todo)"}"></i>`).join("");
+      c.innerHTML = `<b>${parse(d).getDate()}</b><span class="pips">${pips}</span><span class="n">${all.length > 8 ? "+" + (all.length - 8) : ""}</span>`;
+      c.setAttribute("aria-label", `${fmtLong(d)}: ${all.length} Einträge, ${dn} erledigt`);
+      c.onclick = () => { selMonthDay = d; if (!inMonth) selDay = d; renderWeek(); };
+      grid.appendChild(c);
+    }
+    $("mStats").innerHTML = `<div class="stat"><b>${nAct}</b><span>Termine</span></div><div class="stat"><b>${nMeal}</b><span>Mahlzeiten</span></div><div class="stat"><b>${nAll ? Math.round(nDone / nAll * 100) : 0}%</b><span>erledigt</span></div>`;
+    $("wkSub").textContent = `${nAll} Einträge im ${MONTHS[mo]}`;
+    // Vorschau des gewaehlten Tages
+    const d = selMonthDay, all = itemsOn(d), box = $("calDay");
+    box.innerHTML = `<div class="shead"><div class="ico" style="--k:var(--rose)">🗓️</div><h2>${fmtLong(d)}</h2><button class="add" style="--k:var(--rose)" id="calAdd" aria-label="Eintrag hinzufügen">+</button></div>`;
+    const ag = document.createElement("div"); ag.className = "agenda";
+    if (!all.length) ag.innerHTML = '<div class="empty">Noch nichts geplant.</div>';
+    for (const it of all) {
+      const row = document.createElement("div"); row.className = "ai" + (isDone(it, d) ? " done" : "");
+      const lbl = it.type === "meal" ? (MEAL_SLOTS.find(m => m[0] === it.slot) || ["", "Essen", "🍽️"]) : null;
+      row.innerHTML = `<span class="tm">${it.time || (lbl ? lbl[2] : it.type === "todo" ? "✅" : "")}</span><span class="tx">${it.emoji ? it.emoji + " " : ""}${lbl ? `<span class="muted">${lbl[1]}:</span> ` : ""}${esc(it.title)} ${dotsHtml(it.who)}</span>`;
+      row.style.cursor = "pointer"; row.onclick = () => openSheet(it, d);
+      ag.appendChild(row);
+    }
+    box.appendChild(ag);
+    const open = document.createElement("button"); open.className = "btn"; open.style.cssText = "width:100%;margin:8px 0 6px"; open.textContent = "Tag öffnen und abhaken";
+    open.onclick = () => { selDay = d; setView("day"); };
+    box.appendChild(open);
+    $("calAdd").onclick = () => openSheet({ type: "act", date: d });
+  }
   function renderWeek() {
+    document.querySelectorAll("#wkSeg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.mode === weekMode)));
+    $("weekMode").hidden = weekMode !== "week"; $("monthMode").hidden = weekMode !== "month";
+    $("wkTitle").textContent = weekMode === "week" ? "Wochenplan" : "Monatsplan";
+    if (weekMode === "month") { renderMonth(); return; }
     const mon = monday(selDay), t = today();
     $("weekLbl2").textContent = weekLabel(mon);
     let total = 0, done = 0;
@@ -617,6 +709,8 @@
   document.querySelectorAll(".tab").forEach(t => t.onclick = () => setView(t.dataset.tab));
   const shiftWeek = n => { selDay = addDays(selDay, 7 * n); renderAll(); };
   [["prevW", -1], ["nextW", 1], ["prevW2", -1], ["nextW2", 1], ["prevW3", -1], ["nextW3", 1]].forEach(([id, n]) => $(id).onclick = () => shiftWeek(n));
+  const shiftMonth = n => { const d = parse(selDay); selDay = iso(new Date(d.getFullYear(), d.getMonth() + n, 1)); selMonthDay = null; renderAll(); };
+  $("prevM").onclick = () => shiftMonth(-1); $("nextM").onclick = () => shiftMonth(1);
   $("toToday").onclick = () => { selDay = today(); setView("day"); };
   $("copyWeek").onclick = () => {
     const mon = monday(selDay), next = addDays(mon, 7);
